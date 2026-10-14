@@ -1,121 +1,104 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Controls whether the workspace navigation is open on mobile.
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+    <div id="top" className="app">
+      {/* Allows keyboard users to bypass repeated navigation. */}
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+
+      {/* Site branding and mobile navigation control. */}
+      <header className="site-header">
+        <a className="brand" href="#top">
+          Circle Weaver
+        </a>
+
         <button
+          className="menu-toggle"
           type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          aria-expanded={menuOpen}
+          aria-controls="workspace-navigation"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          Count is {count}
+          <span aria-hidden="true">{menuOpen ? '×' : '☰'}</span>
+          <span>{menuOpen ? 'Close' : 'Menu'}</span>
         </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <div className="workspace-layout">
+        {/* Responsive workspace navigation. */}
+        <aside className={`sidebar ${menuOpen ? 'sidebar-open' : ''}`}>
+          <p className="sidebar-title">Workspace</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <nav
+            id="workspace-navigation"
+            aria-label="Workspace navigation"
+            onClick={() => setMenuOpen(false)}
+          >
+            <a href="#workspace-overview">Overview</a>
+            <a href="#discussions">Discussions</a>
+            <a href="#goals">Goals</a>
+            <a href="#meetings">Meetings</a>
+            <a href="#about">About</a>
+          </nav>
+        </aside>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Primary page content. */}
+        <main id="main-content" className="main-content">
+          <section className="hero" aria-labelledby="page-title">
+            <p className="eyebrow">Collaborative workspaces</p>
+            <h1 id="page-title">Keep your team’s work connected</h1>
+            <p>
+              Organize discussions, goals, meetings, and shared documents in
+              one accessible workspace.
+            </p>
+            <a className="primary-action" href="#workspace-overview">
+              Explore the workspace
+            </a>
+          </section>
+
+          <section
+            id="workspace-overview"
+            className="workspace-overview"
+            aria-labelledby="overview-title"
+          >
+            <h2 id="overview-title">Workspace overview</h2>
+
+            <div className="feature-grid">
+              <article id="discussions">
+                <h3>Discussions</h3>
+                <p>Develop ideas and preserve important team decisions.</p>
+              </article>
+
+              <article id="goals">
+                <h3>Goals</h3>
+                <p>Track responsibilities, progress, and upcoming work.</p>
+              </article>
+
+              <article id="meetings">
+                <h3>Meetings</h3>
+                <p>Plan agendas and keep meeting outcomes connected.</p>
+              </article>
+            </div>
+          </section>
+
+          <section id="about" className="about" aria-labelledby="about-title">
+            <h2 id="about-title">About Circle Weaver</h2>
+            <p>This application helps teams collaborate effectively.</p>
+          </section>
+        </main>
+      </div>
+
+      {/* Site-wide footer information. */}
+      <footer>
+        <p>&copy; {new Date().getFullYear()} Circle Weaver</p>
+      </footer>
+    </div>
   )
 }
 
