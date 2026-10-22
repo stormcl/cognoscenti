@@ -1,0 +1,278 @@
+/* Main application layout -- Header, Sidebar, Workspace Layout, and responsive design*/
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  flex: 1;
+  min-height: 100svh;
+  text-align: left;
+}
+
+/* Accessibility: hidden until focused, allowing keyboard users to skip navigation */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 14px;
+  color: var(--text-h);
+  font-weight: 700;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  text-decoration: none;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Sticky site header and brand */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 0 20px;
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text-h);
+  font-size: 32px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.header-nav {
+  display: none;
+  margin-left: auto;
+}
+
+nav a {
+  text-decoration: none;
+  font-weight: bold;
+  color: var(--text-h);
+}
+
+.account-link {
+  display: inline-block;
+}
+
+.account-link:hover {
+  color: #7948a9;
+}
+
+/* Mobile navigation button */
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px;
+  color: var(--text-h);
+  font: inherit;
+  font-weight: 700;
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.menu-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Workspace and mobile navigation */
+.workspace-layout {
+  min-width: 0;
+}
+
+.sidebar {
+  display: none;
+  padding: 16px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: bold;
+}
+
+.sidebar.sidebar-open {
+  display: block;
+}
+
+.sidebar-title {
+  margin: 0 0 8px;
+  color: var(--text-h);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+.sidebar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 12px;
+  color: var(--text-h);
+  background: var(--social-bg);
+  border-radius: 6px;
+  white-space: nowrap;
+  text-decoration: none;
+  border: 0.115rem solid rgba(170, 59, 255, 0.1);
+}
+
+.sidebar a:hover {
+  text-decoration: underline;
+  box-shadow: var(--shadow);
+  background-color: rgba(170, 59, 255, 0.1);
+  text-decoration: none;
+  transform: scale(1.1);
+}
+
+/* Accessibility: visible keyboard focus for interactive elements */
+.brand:focus-visible,
+.sidebar a:focus-visible,
+.primary-action:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Main page content and introductory hero */
+.main-content {
+  min-width: 0;
+  padding: 24px 20px;
+}
+
+.hero {
+  padding: clamp(24px, 6vw, 64px);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+}
+
+.hero h1 {
+  max-width: 15ch;
+}
+
+.hero > p:not(.eyebrow) {
+  max-width: 60ch;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.primary-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 24px;
+  padding: 8px 14px;
+  color: var(--text-h);
+  font-weight: 700;
+  background: var(--accent-bg);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.primary-action:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow);
+}
+
+/* Workspace sections and feature cards */
+.workspace-overview,
+.about {
+  padding-top: 48px;
+  scroll-margin-top: 80px;
+}
+
+.feature-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.feature-grid article {
+  padding: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  scroll-margin-top: 80px;
+}
+
+.feature-grid h3 {
+  margin-top: 0;
+}
+
+/* Page footer */
+footer {
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Desktop: convert mobile navigation into a left sidebar */
+@media (min-width: 768px) {
+  .header-nav {
+    display: block;
+  }
+
+  .menu-toggle{
+    display: none;
+  }
+
+  .workspace-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .sidebar .mobile-account-link {
+    display: none;
+  }
+
+  .sidebar {
+    display: block;
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+  }
+
+  .sidebar nav {
+    position: sticky;
+    top: 80px;
+    overflow: visible;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Accessibility: preserve component boundaries in high-contrast mode */
+@media (forced-colors: active) {
+  .hero,
+  .sidebar a,
+  .primary-action,
+  .feature-grid article {
+    border: 1px solid CanvasText;
+  }
+}
