@@ -1,13 +1,16 @@
 :root {
-  --text: #6d6071;
-  --text-muted: #71807f;
-  --text-h: #233332;
-  --bg: #f7f8fa;
+  --text: #5c5c5c;
+  --text-muted: #8a8a8a;
+  --text-h: #1f1f1f;
+  --bg: #f4f4f4;
   --surface: #ffffff;
-  --border: #e3e9e8;
-  --accent: #672a79;
-  --accent-bg: #f7e9f9;
-  --accent-soft: #f3f6f5;
+  --border: #e6e6e6;
+  --accent: #3d3d3d;
+  --accent-bg: #f0f0f0;
+  --accent-soft: #f3f3f3;
+  --chrome: #333333;
+  --chrome-footer: #4a4a4a;
+  --header-h: 56px;
   --sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
 
   font: 16px/145% var(--sans);
