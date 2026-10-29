@@ -11,6 +11,10 @@
   --chrome: #333333;
   --chrome-footer: #4a4a4a;
   --header-h: 56px;
+  /* Viewport cuts used in App.css:
+     mobile  < 768px
+     tablet  768px–1023px
+     desktop ≥ 1024px */
   --sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
 
   font: 16px/145% var(--sans);

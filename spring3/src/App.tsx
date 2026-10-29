@@ -16,7 +16,11 @@ function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<WorkspaceHome />} />
+        <Route path="/" element={<WorkspaceHome workspaceId="department" />} />
+        <Route
+          path="/organization"
+          element={<WorkspaceHome workspaceId="organization" />}
+        />
         <Route
           path="/meetings"
           element={

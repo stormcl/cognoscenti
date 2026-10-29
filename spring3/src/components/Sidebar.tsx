@@ -1,5 +1,40 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { workspaceFromPath } from '../data/workspaces'
+import Menu from './Menu'
+
+const createItems = [
+  {
+    to: '/meetings',
+    label: 'Meeting',
+    detail: 'Schedule with agenda & Zoom link',
+    icon: '/calendar0.svg',
+  },
+  {
+    to: '/discussions',
+    label: 'Discussion',
+    detail: 'Start a topic for the group',
+    icon: '/msg0.svg',
+  },
+  {
+    to: '/documents',
+    label: 'Document',
+    detail: 'Upload or link a file',
+    icon: '/file0.svg',
+  },
+  {
+    to: '/action-items',
+    label: 'Action item',
+    detail: 'Assign a task with a due date',
+    icon: '/check0.svg',
+  },
+  {
+    to: '/notes',
+    label: 'Note',
+    detail: 'Private or shared notes',
+    icon: '/pen0.svg',
+  },
+]
 
 type SidebarProps = {
   menuOpen: boolean
@@ -17,10 +52,6 @@ type NavItem = {
   count?: number
 }
 
-const dashboardLinks: NavItem[] = [
-  { to: '/', label: 'Home', icon: '/house0.svg', end: true },
-]
-
 const circleLinks: NavItem[] = [
   { to: '/meetings', label: 'Meetings', icon: '/slides0.svg' },
   { to: '/tasks', label: 'To-do Tasks', icon: '/square-check0.svg', count: 1 },
@@ -33,16 +64,13 @@ const organizationLinks: NavItem[] = [
   { to: '/documents', label: 'Documents', icon: '/file0.svg' },
 ]
 
-const childWorkspaces = [
-  { to: '/workspaces', code: 'UM', name: 'UX Meeting Module', members: 9 },
-  { to: '/workspaces', code: 'UA', name: 'UX Admin Pages', members: 0 },
-]
-
 function navClassName(isActive: boolean) {
   return `nav-item${isActive ? ' current' : ''}`
 }
 
 function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarProps) {
+  const location = useLocation()
+  const workspace = workspaceFromPath(location.pathname)
   const [switcherOpen, setSwitcherOpen] = useState(false)
 
   function onSwitcherClick() {
@@ -58,7 +86,7 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
     <aside className={`sidebar${menuOpen ? ' sidebar-open' : ''}`}>
       <div className="sidebar-top">
         <div className="sidebar-user">
-          <strong>Shreya Chadha</strong>
+          <strong>Users Name</strong>
           <span>Steward</span>
         </div>
         <button
@@ -74,28 +102,60 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
       </div>
 
       <div className="primary-navigation">
-        <nav aria-label="Dashboard" onClick={closeMenu}>
-          <p className="section-label">Dashboard</p>
-          {dashboardLinks.map((item) => (
-            <NavRow key={item.label} item={item} />
+        <Menu
+          className="create-button"
+          menuClassName="create-menu"
+          ariaLabel="Create"
+          label={
+            <>
+              <img src="/plus0.svg" alt="" width={14} height={14} />
+              <span>Create</span>
+              <img className="create-chevron" src="/chevron-down0.svg" alt="" width={14} height={14} />
+            </>
+          }
+        >
+          <p className="create-menu-heading">Create in {workspace.name}</p>
+          {createItems.map((item) => (
+            <Link
+              key={item.label}
+              className="create-option"
+              to={item.to}
+              role="menuitem"
+              onClick={closeMenu}
+            >
+              <span className="icon-tile">
+                <img src={item.icon} alt="" width={18} height={18} />
+              </span>
+              <span className="create-option-text">
+                <strong>{item.label}</strong>
+                <span>{item.detail}</span>
+              </span>
+            </Link>
           ))}
+        </Menu>
+
+        <nav aria-label="My Weaver" onClick={closeMenu}>
+          <p className="section-label">My Weaver</p>
+          <NavRow
+            item={{ to: workspace.path, label: 'Home', icon: '/house0.svg', end: true }}
+          />
 
           <div className={`workspace-switcher-block${switcherOpen ? ' is-open' : ''}`}>
             <button
               className="workspace-switcher"
               type="button"
               aria-expanded={switcherOpen}
-              aria-label="UX Primary Group"
+              aria-label={workspace.name}
               onClick={onSwitcherClick}
             >
               <span className="workspace-avatar" aria-hidden="true">
-                UX
+                {workspace.code}
               </span>
               <span className="workspace-name">
-                <strong>UX Primary Group</strong>
+                <strong>{workspace.name}</strong>
                 <span>
                   <img src="/users0.svg" alt="" width={12} height={12} />
-                  14 members
+                  {workspace.members} members
                 </span>
               </span>
               <img className="switcher-chevron" src="/chevron-down0.svg" alt="" width={14} height={14} />
@@ -103,11 +163,25 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
 
             {switcherOpen && !collapsed ? (
               <div className="workspace-children">
-                {childWorkspaces.map((child) => (
+                {workspace.id === 'department' ? (
+                  <Link className="workspace-child" to="/organization" onClick={closeMenu}>
+                    <span className="workspace-avatar sm" aria-hidden="true">
+                      OW
+                    </span>
+                    <span className="workspace-name">
+                      <strong>Organization Workspace</strong>
+                      <span>
+                        <img src="/users0.svg" alt="" width={12} height={12} />
+                        42 members
+                      </span>
+                    </span>
+                  </Link>
+                ) : null}
+                {workspace.children.map((child) => (
                   <Link
                     key={child.code}
                     className="workspace-child"
-                    to={child.to}
+                    to={child.path}
                     onClick={closeMenu}
                   >
                     <span className="workspace-avatar sm" aria-hidden="true">
@@ -148,9 +222,9 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
         </nav>
       </div>
 
-      <Link className="ask-weaver" to="/ask" onClick={closeMenu}>
-        <img src="/sparkle0.svg" alt="" width={16} height={16} />
-        <span>Ask Weaver</span>
+      <Link className="ask-weaver" to="/ask" onClick={closeMenu} aria-label="Ask Weaver">
+        <img className="ask-weaver-label" src="/ask-weaver.svg" alt="Ask Weaver" width={135} height={40} />
+        <img className="ask-weaver-mark" src="/ask-weaver-mark.svg" alt="" width={40} height={40} />
       </Link>
     </aside>
   )

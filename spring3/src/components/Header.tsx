@@ -32,8 +32,23 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
 
   return (
     <header className="site-header">
+      <button
+        className="menu-toggle"
+        type="button"
+        onClick={() => setMenuOpen((open) => !open)}
+        aria-expanded={menuOpen}
+        aria-controls="workspace-navigation"
+      >
+        <span aria-hidden="true">{menuOpen ? '×' : '☰'}</span>
+        <span className="visually-hidden">
+          {menuOpen ? 'Close menu' : 'Open menu'}
+        </span>
+      </button>
+
       <Link className="brand" to="/">
-        <img className="brand-logo" src="/image-30.png" alt="" width={22} height={22} />
+        <span className="brand-logo" aria-hidden="true">
+          <img src="/image-30.png" alt="" width={16} height={16} />
+        </span>
         Weaver
       </Link>
 
@@ -65,8 +80,8 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
           ariaLabel="Account"
           label={
             <>
-              <span className="avatar" aria-hidden="true">SC</span>
-              <span className="account-name">Shreya Chadha</span>
+              <span className="avatar" aria-hidden="true">UN</span>
+              <span className="account-name">Users Name</span>
               <img src="/chevron-down1.svg" alt="" width={14} height={14} />
             </>
           }
@@ -80,16 +95,13 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
         </Menu>
       </div>
 
-      <button
-        className="menu-toggle"
-        type="button"
-        onClick={() => setMenuOpen((open) => !open)}
-        aria-expanded={menuOpen}
-        aria-controls="workspace-navigation"
+      <Link
+        className="header-search-toggle"
+        to="/search"
+        aria-label="Search workspaces, documents, people"
       >
-        <span aria-hidden="true">{menuOpen ? '×' : '☰'}</span>
-        <span>{menuOpen ? 'Close' : 'Menu'}</span>
-      </button>
+        <img src="/search1.png" alt="" width={18} height={18} />
+      </Link>
     </header>
   )
 }
