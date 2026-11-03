@@ -3908,4 +3908,254 @@ a.header-search-toggle {
   .docs-select {
     min-height: 44px;
   }
+
+  .discussion-composer-grid,
+  .discussion-composer-foot,
+  .discussion-starter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .discussion-composer-grid {
+    display: flex;
+  }
+}
+
+/* Discussions */
+.discussion-starter,
+.discussion-composer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.discussion-composer {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 18px 18px 16px;
+}
+
+.discussion-starter-input {
+  flex: 1;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: text;
+}
+
+.discussion-composer-head,
+.discussion-composer-foot,
+.discussion-composer-actions,
+.discussion-topic,
+.discussion-replies,
+.discussion-status,
+.discussion-notify {
+  display: flex;
+  align-items: center;
+}
+
+.discussion-composer-head {
+  gap: 12px;
+}
+
+.discussion-composer-head div {
+  flex: 1;
+  min-width: 0;
+}
+
+.discussion-composer-head h2 {
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+
+.discussion-composer-head p {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.discussion-composer-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.discussion-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.discussion-field abbr {
+  color: #b42318;
+  text-decoration: none;
+}
+
+.discussion-field input,
+.discussion-editor textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-h);
+  font: inherit;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.discussion-field input {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.discussion-count {
+  align-self: flex-end;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.discussion-editor {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.discussion-editor textarea {
+  min-height: 96px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 0;
+  resize: vertical;
+}
+
+.discussion-toolbar {
+  display: flex;
+  gap: 2px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.discussion-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.discussion-toolbar button:hover,
+.discussion-starter-input:hover {
+  background: var(--accent-bg);
+}
+
+.discussion-composer-foot {
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.discussion-notify {
+  gap: 8px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.discussion-composer-actions {
+  gap: 8px;
+  margin-left: auto;
+}
+
+.discussions-table {
+  min-width: 760px;
+}
+
+.docs-table-card {
+  overflow-x: auto;
+}
+
+.discussion-topic {
+  gap: 10px;
+  color: var(--text-h);
+}
+
+.discussion-topic-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--accent-bg);
+}
+
+.discussion-topic strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.discussion-topic span span {
+  display: block;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.discussion-status {
+  gap: 6px;
+  width: fit-content;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: var(--text-h);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.discussion-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6d6d6d;
+}
+
+.discussion-status.is-draft {
+  color: var(--text);
+}
+
+.discussion-replies {
+  gap: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.discussions .docs-select {
+  margin-left: auto;
 }

@@ -12,7 +12,7 @@ const createItems = [
     icon: '/calendar0.svg',
   },
   {
-    to: '/discussions',
+    to: '/discussions?new=1',
     label: 'Discussion',
     detail: 'Start a topic for the group',
     icon: '/msg0.svg',
