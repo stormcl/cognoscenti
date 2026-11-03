@@ -22,7 +22,11 @@ function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   })
 
   useEffect(() => {
-    window.localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0')
+    try {
+      window.localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0')
+    } catch {
+      // sidebar still works if localStorage is unavailable
+    }
   }, [collapsed])
 
   useEffect(() => {

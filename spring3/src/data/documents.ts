@@ -374,7 +374,7 @@ function load(): WorkspaceDocument[] {
       return SEED
     }
     const parsed = JSON.parse(raw) as WorkspaceDocument[]
-    return Array.isArray(parsed) && parsed.length ? parsed : SEED
+    return Array.isArray(parsed) ? parsed : SEED
   } catch {
     return SEED
   }
