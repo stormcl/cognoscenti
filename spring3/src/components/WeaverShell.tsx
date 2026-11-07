@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 
 export type WeaverMode = 'ask' | 'scribe'
 
@@ -24,9 +24,22 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-function useTypewriter(phrases: readonly string[], running: boolean) {
-  const [text, setText] = useState(phrases[0] ?? '')
+function promptLead(mode: WeaverMode) {
+  return mode === 'scribe' ? 'Ask Weaver Scribe' : 'Ask Weaver'
+}
 
+function promptTails(prompts: readonly string[], lead: string) {
+  const prefix = lead.toLowerCase()
+  return prompts.map((prompt) => {
+    if (prompt.toLowerCase().startsWith(prefix)) {
+      return prompt.slice(lead.length).trimStart()
+    }
+    return prompt
+  })
+}
+
+function useTypewriter(phrases: readonly string[], running: boolean) {
+  const [text, setText] = useState('')
   const script = phrases.join('\n')
 
   useEffect(() => {
@@ -51,10 +64,10 @@ function useTypewriter(phrases: readonly string[], running: boolean) {
         setText(current.slice(0, index))
         if (index >= current.length) {
           deleting = true
-          timer = window.setTimeout(tick, 1600)
+          timer = window.setTimeout(tick, 2600)
           return
         }
-        timer = window.setTimeout(tick, 48)
+        timer = window.setTimeout(tick, 110)
         return
       }
       index -= 1
@@ -62,14 +75,14 @@ function useTypewriter(phrases: readonly string[], running: boolean) {
       if (index <= 0) {
         deleting = false
         phrase = (phrase + 1) % phrases.length
-        timer = window.setTimeout(tick, 320)
+        timer = window.setTimeout(tick, 640)
         return
       }
-      timer = window.setTimeout(tick, 24)
+      timer = window.setTimeout(tick, 55)
     }
 
     setText('')
-    timer = window.setTimeout(tick, 360)
+    timer = window.setTimeout(tick, 480)
     return () => window.clearTimeout(timer)
   }, [script, running, phrases])
 
@@ -94,8 +107,11 @@ function WeaverShell({
   const [typingId, setTypingId] = useState<number | null>(null)
   const nextId = useRef(1)
   const pendingReply = useRef<{ id: number; text: string } | null>(null)
-  const ghost = useTypewriter(prompts, draft.length === 0)
+  const lead = promptLead(mode)
+  const tails = useMemo(() => promptTails(prompts, lead), [prompts, lead])
+  const ghost = useTypewriter(tails, draft.length === 0)
   const Heading = variant === 'page' ? 'h1' : 'p'
+  const markSize = variant === 'page' ? 42 : 34
 
   useEffect(() => {
     const log = logRef.current
@@ -159,7 +175,9 @@ function WeaverShell({
   return (
     <section className={`weaver-shell is-${variant}${mode === 'scribe' ? ' is-scribe' : ''}`}>
       <header className="weaver-shell-head">
-        <img src="/weaver-mark-scribe.svg" alt="" width={28} height={28} />
+        <span className={`weaver-mark-live${variant === 'reports' ? ' is-compact' : ''}`}>
+          <img src="/weaver-mark-scribe.svg" alt="" width={markSize} height={markSize} />
+        </span>
         <div>
           <Heading>{title}</Heading>
           <p>{kicker}</p>
@@ -199,7 +217,9 @@ function WeaverShell({
         ) : (
           messages.map((message) => (
             <article key={message.id} className={`weaver-turn is-${message.role}`}>
-              {message.role === 'weaver' ? <img src="/weaver-mark-scribe.svg" alt="" width={20} height={20} /> : null}
+              {message.role === 'weaver' ? (
+                <img className="weaver-mark-quiet" src="/weaver-mark-scribe.svg" alt="" width={26} height={26} />
+              ) : null}
               <p>
                 {message.text}
                 {message.id === typingId ? <span className="shell-caret" aria-hidden="true" /> : null}
@@ -228,7 +248,7 @@ function WeaverShell({
           />
           {draft.length === 0 ? (
             <span className="weaver-shell-ghost" aria-hidden="true">
-              {ghost}
+              <span className="weaver-shell-lead">{lead}</span> {ghost}
               <span className="shell-caret" />
             </span>
           ) : null}
