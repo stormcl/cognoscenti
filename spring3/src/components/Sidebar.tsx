@@ -204,7 +204,7 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
 
       <Link className="ask-weaver" to="/ask" onClick={closeMenu} aria-label="Ask Weaver">
         <img className="ask-weaver-label" src="/ask-weaver.svg" alt="Ask Weaver" width={135} height={40} />
-        <img className="ask-weaver-mark" src="/ask-weaver-mark.svg" alt="" width={40} height={40} />
+        <img className="ask-weaver-mark" src="/weaver-mark-scribe.svg" alt="" width={40} height={40} />
       </Link>
     </aside>
   )
@@ -256,7 +256,9 @@ function NavRow({ item }: { item: NavItem }) {
         height={18}
       />
       <span>{item.label}</span>
-      {item.count != null ? <span className="nav-count">{item.count}</span> : null}
+      {item.count != null ? (
+        <span className={`nav-count${item.to === '/notifications' ? ' is-notify' : ''}`}>{item.count}</span>
+      ) : null}
     </NavLink>
   )
 }

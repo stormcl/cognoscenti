@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Dispatch, FormEvent, SetStateAction } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { applyTheme, brandMark, readTheme, themes, type ThemeId } from '../theme'
 import Menu from './Menu'
 
 type HeaderProps = {
@@ -11,6 +12,12 @@ type HeaderProps = {
 function Header({ menuOpen, setMenuOpen }: HeaderProps) {
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [theme, setTheme] = useState<ThemeId>(() => readTheme())
+
+  function chooseTheme(next: ThemeId) {
+    applyTheme(next)
+    setTheme(next)
+  }
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -47,9 +54,9 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
 
       <Link className="brand" to="/">
         <span className="brand-logo" aria-hidden="true">
-          <img src="/image-30.png" alt="" width={16} height={16} />
+          <img src={brandMark(theme)} alt="" width={48} height={48} />
         </span>
-        Weaver
+        <span className="brand-name">Weaver</span>
       </Link>
 
       <form className="header-search" onSubmit={onSearch}>
@@ -70,7 +77,7 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
         <Link className="icon-button" to="/help" aria-label="Help">
           <img src="/circle-help0.svg" alt="" width={18} height={18} />
         </Link>
-        <Link className="icon-button" to="/notifications" aria-label="Notifications">
+        <Link className="icon-button has-notify" to="/notifications" aria-label="Notifications">
           <img src="/bell0.svg" alt="" width={18} height={18} />
         </Link>
         <span className="header-divider" aria-hidden="true" />
@@ -92,6 +99,21 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
           <Link to="/help" role="menuitem">
             Help
           </Link>
+          <div className="menu-dev" data-keep-open>
+            <p>Dev mode</p>
+            {themes.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="menuitemradio"
+                aria-checked={theme === option.id}
+                onClick={() => chooseTheme(option.id)}
+              >
+                <span className={`theme-swatch is-${option.id}`} aria-hidden="true" />
+                {option.label}
+              </button>
+            ))}
+          </div>
         </Menu>
       </div>
 

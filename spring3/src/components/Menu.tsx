@@ -52,7 +52,17 @@ function Menu({ label, className, menuClassName, children, ariaLabel }: MenuProp
         {label}
       </button>
       {open ? (
-        <div id={menuId} className="menu-panel" role="menu" onClick={() => setOpen(false)}>
+        <div
+          id={menuId}
+          className="menu-panel"
+          role="menu"
+          onClick={(event) => {
+            if ((event.target as HTMLElement).closest('[data-keep-open]')) {
+              return
+            }
+            setOpen(false)
+          }}
+        >
           {children}
         </div>
       ) : null}

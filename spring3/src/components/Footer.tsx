@@ -1,7 +1,8 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { documentsPath } from '../data/documents'
+import { brandMark, readTheme } from '../theme'
 import { workspaceFromLocation } from '../data/workspaces'
 
 const homeLinks = [
@@ -28,6 +29,13 @@ function Footer() {
   const location = useLocation()
   const workspace = workspaceFromLocation(location.pathname, location.search)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [theme, setTheme] = useState(readTheme)
+
+  useEffect(() => {
+    const sync = () => setTheme(readTheme())
+    window.addEventListener('weaver-theme', sync)
+    return () => window.removeEventListener('weaver-theme', sync)
+  }, [])
 
   function onSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -39,7 +47,9 @@ function Footer() {
     <footer>
       <div className="footer-top">
         <Link className="footer-brand" to="/">
-          <span className="footer-mark" aria-hidden="true" />
+          <span className="footer-mark" aria-hidden="true">
+            <img src={brandMark(theme)} alt="" width={40} height={40} />
+          </span>
           Circle Weaver
         </Link>
         <form className="footer-search" onSubmit={onSearch}>

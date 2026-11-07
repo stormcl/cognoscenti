@@ -1,15 +1,31 @@
 :root {
-  --text: #5c5c5c;
-  --text-muted: #8a8a8a;
-  --text-h: #1f1f1f;
-  --bg: #f4f4f4;
+  --text: #3d5166;
+  --text-muted: #6a8094;
+  --text-h: #132a41;
+  --bg: #f3f7fb;
   --surface: #ffffff;
-  --border: #e6e6e6;
-  --accent: #3d3d3d;
-  --accent-bg: #f0f0f0;
-  --accent-soft: #f3f3f3;
-  --chrome: #333333;
-  --chrome-footer: #4a4a4a;
+  --border: #c5d9e8;
+  --accent: #3e6fa6;
+  --accent-2: #87bbd7;
+  --accent-bg: #d6eaf6;
+  --accent-soft: #eaf4fb;
+  --chrome: #132a41;
+  --chrome-footer: #132a41;
+  --meeting: var(--accent);
+  --on-meeting: #ffffff;
+  --online: #00a03f;
+  --away: #f8b82f;
+  --busy: #cb0035;
+  --offline: #4a4a4a;
+  --notify: #f8b82f;
+  --error: #cb0035;
+  --scribe: #57175d;
+  --scribe-mid: #854e89;
+  --scribe-light: #c69ed9;
+  --scribe-peri: #99a2ea;
+  --minutes-bg: #fce5c7;
+  --minutes-ink: #585653;
+  --minutes-border: #e4c9a4;
   --header-h: 56px;
   /* Viewport cuts used in App.css:
      mobile  < 768px
@@ -24,6 +40,55 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html[data-theme='primary-2'] {
+  --text: #2c4a73;
+  --text-muted: #5d7696;
+  --text-h: #04285f;
+  --bg: #f2f8fb;
+  --border: #b7dce3;
+  --accent: #1b5bd1;
+  --accent-2: #1b97d1;
+  --accent-bg: #cbeef3;
+  --accent-soft: #e5f6f8;
+  --chrome: #003dad;
+  --chrome-footer: #003dad;
+}
+
+html[data-theme='additional-dark'] {
+  color-scheme: dark;
+  --text: #d5d3de;
+  --text-muted: #a8a4b4;
+  --text-h: #f4f2f8;
+  --bg: #18213d;
+  --surface: #29262e;
+  --border: #3d3a48;
+  --accent: #6336b5;
+  --accent-2: #3454d1;
+  --accent-bg: #34304a;
+  --accent-soft: #221f2a;
+  --chrome: #29262e;
+  --chrome-footer: #14182c;
+  --minutes-bg: #585653;
+  --minutes-ink: #fce5c7;
+  --minutes-border: #6e6c69;
+}
+
+html[data-theme='additional-light'] {
+  --text: #5c4650;
+  --text-muted: #8a7080;
+  --text-h: #3a2430;
+  --bg: #eeeef7;
+  --border: #e4d4ea;
+  --accent: #e83e8c;
+  --accent-2: #f5a16c;
+  --accent-bg: #ffd166;
+  --accent-soft: #fff6df;
+  --chrome: #e83e8c;
+  --chrome-footer: #c43178;
+  --meeting: #f5a16c;
+  --on-meeting: #3a2218;
 }
 
 * {
