@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   EXPORT_OPTIONS,
@@ -28,6 +28,7 @@ import {
   type MeetingStatus,
   type Participant,
 } from '../data/meetings'
+import WeaverShell from '../components/WeaverShell'
 import { normalizeWorkspaceId, workspaces } from '../data/workspaces'
 
 type Tool = 'setup' | 'participants' | 'overview'
@@ -857,13 +858,29 @@ function ReportsOverlay({
   onToggleRecord: () => void
   onClose: () => void
 }) {
-  const [askOpen, setAskOpen] = useState(false)
-  const [prompt, setPrompt] = useState('Rewrite this agenda from the meeting description.')
   const [minutes, setMinutes] = useState(meeting.minutes)
+  const agendaPrompts = useMemo(
+    () => [
+      'Ask Weaver to rewrite this agenda',
+      'Ask Weaver to fit the agenda to the time',
+      'Ask Weaver what this meeting should decide',
+      `Ask Weaver about ${meeting.name}`,
+    ],
+    [meeting.name],
+  )
+  const scribePrompts = useMemo(
+    () => [
+      'Ask Weaver Scribe to draft the minutes',
+      'Ask Weaver Scribe to pull out the decisions',
+      'Ask Weaver Scribe for next steps',
+      'Ask Weaver Scribe to summarize this recording',
+    ],
+    [],
+  )
   const documentText = meeting.agendaDocument || buildAgendaDocument(meeting)
   const transcriptDone = scribe.typedTranscript.length >= TRANSCRIPT_SAMPLE.length && scribe.typedTranscript.length > 0
   const draftSummary = scribeDraftSummary(meeting)
-  const { recording, showTranscript, showSummary, summaryAdded, scribeOpen, tab } = scribe
+  const { recording, showTranscript, showSummary, summaryAdded, tab } = scribe
 
   useEffect(() => {
     setMinutes(meeting.minutes)
@@ -876,7 +893,6 @@ function ReportsOverlay({
   function runAskWeaver() {
     const next = askWeaverAgenda(meeting)
     saveMeeting({ ...meeting, agendaDocument: next })
-    setAskOpen(false)
   }
 
   function addDraftToMinutes() {
@@ -930,34 +946,6 @@ function ReportsOverlay({
             <h3>{meeting.name}</h3>
             <p className="reports-when">{when}</p>
             <pre className="agenda-doc">{documentText}</pre>
-            {askOpen ? (
-              <form
-                className="ask-box"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  runAskWeaver()
-                }}
-              >
-                <label className="field">
-                  <span>Ask Weaver</span>
-                  <textarea rows={3} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
-                </label>
-                <button className="button-light" type="submit">
-                  Submit Prompt
-                </button>
-              </form>
-            ) : null}
-            <div className="reports-ask">
-              <button
-                className="ask-weaver reports-ask-btn"
-                type="button"
-                onClick={() => setAskOpen((open) => !open)}
-                aria-label="Ask Weaver"
-              >
-                <img className="ask-weaver-label" src="/ask-weaver.svg" alt="Ask Weaver" width={135} height={40} />
-                <img className="ask-weaver-mark" src="/weaver-mark-scribe.svg" alt="" width={40} height={40} />
-              </button>
-            </div>
           </div>
         ) : (
           <div className="reports-body" role="tabpanel">
@@ -1015,42 +1003,61 @@ function ReportsOverlay({
                 ) : null}
               </div>
             ) : null}
-            <div className="reports-ask weaver-scribe-bar">
-              <button
-                className={`weaver-scribe-btn${scribeOpen ? ' is-open' : ''}`}
-                type="button"
-                aria-expanded={scribeOpen}
-                aria-label="Weaver Scribe"
-                onClick={() =>
-                  setScribe((session) => ({
-                    ...session,
-                    scribeOpen: session.recording ? true : !session.scribeOpen,
-                  }))
-                }
-              >
-                <img src="/weaver-scribe.svg" alt="Weaver Scribe" width={168} height={40} />
-              </button>
-              {scribeOpen ? (
-                <>
-                  <button
-                    className={`scribe-record${recording ? ' is-recording' : ''}`}
-                    type="button"
-                    onClick={onToggleRecord}
-                  >
-                    <span className="record-dot" aria-hidden="true" />
-                    {recordLabel()}
-                  </button>
-                  <button
-                    className="chip"
-                    type="button"
-                    onClick={() => setScribe((session) => ({ ...session, showSummary: true, summaryAdded: false }))}
-                  >
-                    Summarize
-                  </button>
-                </>
-              ) : null}
-            </div>
           </div>
+        )}
+        {tab === 'agenda' ? (
+          <WeaverShell
+            key="reports-ask"
+            variant="reports"
+            mode="ask"
+            title="Ask Weaver"
+            kicker={meeting.name}
+            prompts={agendaPrompts}
+            replyFor={() =>
+              `I rewrote the agenda for ${meeting.name} from the meeting description. The suggested agenda is in the document above, ready to edit before the meeting.`
+            }
+            onSubmit={runAskWeaver}
+          />
+        ) : (
+          <WeaverShell
+            key="reports-scribe"
+            variant="reports"
+            mode="scribe"
+            title="Weaver Scribe"
+            kicker={recording ? 'Listening to this meeting' : 'Minutes from this recording'}
+            prompts={scribePrompts}
+            replyFor={() =>
+              scribe.typedTranscript
+                ? `I drafted minutes from this recording of ${meeting.name}. Review the summary beside the transcript, then add it if it looks useful.`
+                : `Weaver Scribe is ready for ${meeting.name}. Record the meeting and the transcript will arrive in short phrases. Then I can draft the minutes.`
+            }
+            onSubmit={(prompt) => {
+              const wantsDraft = /minute|summar|draft|decision|next step/i.test(prompt)
+              if (wantsDraft && scribe.typedTranscript) {
+                setScribe((session) => ({ ...session, showSummary: true, summaryAdded: false }))
+              }
+            }}
+            extra={
+              <div className="weaver-shell-tools">
+                <button
+                  className={`scribe-record${recording ? ' is-recording' : ''}`}
+                  type="button"
+                  onClick={onToggleRecord}
+                >
+                  <span className="record-dot" aria-hidden="true" />
+                  {recordLabel()}
+                </button>
+                <button
+                  className="chip"
+                  type="button"
+                  onClick={() => setScribe((session) => ({ ...session, showSummary: true, summaryAdded: false }))}
+                  disabled={!scribe.typedTranscript && !recording}
+                >
+                  Summarize
+                </button>
+              </div>
+            }
+          />
         )}
       </aside>
     </div>

@@ -3355,6 +3355,278 @@ a.header-search-toggle {
   border-radius: 10px;
 }
 
+.weaver-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.weaver-shell.is-page {
+  flex: 1;
+  min-height: min(680px, calc(100svh - 220px));
+}
+
+.weaver-shell.is-reports {
+  flex: 0 0 auto;
+  margin: 0 18px 16px;
+  border-color: color-mix(in srgb, var(--scribe) 28%, var(--border));
+  border-radius: 14px;
+}
+
+.weaver-shell.is-scribe {
+  border-color: color-mix(in srgb, var(--scribe-mid) 45%, var(--border));
+}
+
+.weaver-shell-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.weaver-shell-head img {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  filter: none;
+}
+
+.weaver-shell-head h1,
+.weaver-shell-head p {
+  margin: 0;
+}
+
+.weaver-shell-head h1,
+.weaver-shell-head > div > p:first-child,
+.weaver-shell.is-reports .weaver-shell-head > div > p:first-of-type {
+  color: var(--text-h);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.weaver-shell.is-page .weaver-shell-head h1 {
+  font-size: 22px;
+}
+
+.weaver-shell-head > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.weaver-shell-head > div p {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.weaver-shell.is-reports .weaver-shell-head > div > p:first-child {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.weaver-shell-modes {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.weaver-shell.is-scribe .weaver-shell-modes {
+  background: color-mix(in srgb, var(--scribe-light) 45%, var(--surface));
+}
+
+.weaver-shell-modes button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.weaver-shell-modes button[aria-checked='true'] {
+  background: var(--surface);
+  color: var(--text-h);
+  box-shadow: 0 1px 2px rgba(19, 42, 65, 0.12);
+}
+
+.weaver-shell-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+}
+
+.weaver-shell.is-reports .weaver-shell-log {
+  max-height: 168px;
+  min-height: 72px;
+  padding: 12px;
+}
+
+.weaver-shell-empty {
+  margin: auto 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.weaver-turn {
+  display: flex;
+  gap: 8px;
+  max-width: 92%;
+}
+
+.weaver-turn.is-user {
+  align-self: flex-end;
+}
+
+.weaver-turn img {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  filter: none;
+}
+
+.weaver-turn p {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--scribe-light) 35%, var(--surface));
+  color: var(--text-h);
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.weaver-turn.is-user p {
+  background: var(--accent-bg);
+}
+
+.weaver-shell.is-scribe .weaver-turn.is-user p {
+  background: color-mix(in srgb, var(--scribe-peri) 35%, var(--surface));
+}
+
+.weaver-shell-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 12px 10px;
+}
+
+.weaver-shell-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.weaver-shell-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.weaver-shell-field textarea {
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: none;
+}
+
+.weaver-shell-field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.weaver-shell.is-scribe .weaver-shell-field textarea:focus {
+  outline-color: var(--scribe-mid);
+}
+
+.weaver-shell-ghost {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  right: 12px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.shell-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: transcript-caret 1s step-end infinite;
+}
+
+.weaver-shell-send {
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.weaver-shell.is-scribe .weaver-shell-send {
+  background: var(--scribe);
+}
+
+.weaver-shell-send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .weaver-shell-head {
+    flex-wrap: wrap;
+  }
+
+  .weaver-shell-modes {
+    width: 100%;
+  }
+
+  .weaver-shell-modes button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-caret {
+    animation: none;
+  }
+}
+
 @media (max-width: 1023px) {
   .meetings-index-grid,
   .room-layout,

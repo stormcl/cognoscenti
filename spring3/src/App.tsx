@@ -7,6 +7,7 @@ import MeetingRoomPage from './pages/MeetingRoomPage'
 import MeetingsIndexPage from './pages/MeetingsIndexPage'
 import MyMeetingsPage from './pages/MyMeetingsPage'
 import NewMeetingPage from './pages/NewMeetingPage'
+import AskWeaverPage from './pages/AskWeaverPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import WorkspaceHome from './pages/WorkspaceHome'
 import './App.css'
@@ -118,15 +119,7 @@ function App() {
             />
           }
         />
-        <Route
-          path="/ask"
-          element={
-            <PlaceholderPage
-              title="Ask Weaver"
-              description="Ask Weaver about this workspace."
-            />
-          }
-        />
+        <Route path="/ask" element={<AskWeaverPage />} />
         <Route
           path="/settings"
           element={
