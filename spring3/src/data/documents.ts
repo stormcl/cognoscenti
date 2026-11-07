@@ -398,6 +398,10 @@ function getDocuments() {
   return documents
 }
 
+export function listDocuments(): WorkspaceDocument[] {
+  return documents
+}
+
 export function useWorkspaceDocuments(workspaceId: WorkspaceId) {
   const all = useSyncExternalStore(subscribe, getDocuments, getDocuments)
   return all.filter((item) => item.workspaceId === workspaceId)

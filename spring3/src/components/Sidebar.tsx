@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { documentsPath } from '../data/documents'
+import { directoryPath } from '../data/profiles'
 import { switcherTree, workspaceFromLocation, type SwitcherEntry } from '../data/workspaces'
 import Menu from './Menu'
 
@@ -61,6 +62,7 @@ const circleLinks: NavItem[] = [
 
 const organizationLinks: NavItem[] = [
   { to: '/notifications', label: 'Notifications', icon: '/bell0.svg', count: 35 },
+  { to: directoryPath(), label: 'Profiles', icon: '/users1.svg', end: true },
   { to: '/emails', label: 'Emails', icon: '/mail0.svg', count: 2 },
   { to: '/documents', label: 'Documents', icon: '/file0.svg' },
 ]
@@ -87,10 +89,10 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
   return (
     <aside className={`sidebar${menuOpen ? ' sidebar-open' : ''}`}>
       <div className="sidebar-top">
-        <div className="sidebar-user">
+        <Link className="sidebar-user" to="/profile">
           <strong>Users Name</strong>
           <span>Steward</span>
-        </div>
+        </Link>
         <button
           className="collapse-sidebar"
           type="button"

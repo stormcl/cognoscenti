@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { HierarchyRow, Person, RecentUpdate, UpdateKind, WorkspaceId } from '../data/workspaces'
 import { documentsPath, useDocumentCount } from '../data/documents'
+import { profilePath } from '../data/profiles'
 import { workspaces } from '../data/workspaces'
 
 type UpdateTab = 'all' | 'meetings' | 'files' | 'discussions'
@@ -270,7 +271,7 @@ function WorkspaceHome({ workspaceId }: WorkspaceHomeProps) {
                 </Link>
               </li>
               <li>
-                <Link className="glance-link" to="/members">
+                <Link className="glance-link" to={`/profile?workspace=${workspaceId}`}>
                   <span className="icon-tile">
                     <img src="/users1.svg" alt="" width={18} height={18} />
                   </span>
@@ -289,18 +290,24 @@ function WorkspaceHome({ workspaceId }: WorkspaceHomeProps) {
                 <img src="/users0.svg" alt="" width={16} height={16} />
                 People
               </h2>
-              <Link className="view-all" to="/members">
+              <Link className="view-all" to={`/profile?workspace=${workspaceId}`}>
                 View all
               </Link>
             </div>
 
             {you ? (
               <div className="people-you">
-                <span className="person-avatar lg" aria-hidden="true">
+                <Link
+                  className="person-avatar lg"
+                  to={profilePath(you.name, workspaceId)}
+                  aria-label={`${you.name} profile`}
+                >
                   {you.initials}
-                </span>
+                </Link>
                 <div className="people-you-text">
-                  <strong>You</strong>
+                  <strong>
+                    <Link to={profilePath(you.name, workspaceId)}>You</Link>
+                  </strong>
                   <span>
                     {you.role === 'steward' ? 'Steward' : 'Member'}
                     {watching ? (
@@ -325,12 +332,21 @@ function WorkspaceHome({ workspaceId }: WorkspaceHomeProps) {
 
             <div className="member-stack" aria-label="Workspace members">
               {stackedPeople.map((person, index) => (
-                <MemberAvatar key={person.initials} person={person} index={index} />
+                <MemberAvatar
+                  key={person.initials}
+                  person={person}
+                  index={index}
+                  workspaceId={workspaceId}
+                />
               ))}
               {overflowCount > 0 ? (
-                <span className="person-avatar overflow" aria-label={`${overflowCount} more members`}>
+                <Link
+                  className="person-avatar overflow"
+                  to={`/profile?workspace=${workspaceId}`}
+                  aria-label={`${overflowCount} more members`}
+                >
                   +{overflowCount}
-                </span>
+                </Link>
               ) : null}
               {query && stackedPeople.length === 0 ? (
                 <span className="member-empty">No matching members</span>
@@ -354,7 +370,7 @@ function WorkspaceHome({ workspaceId }: WorkspaceHomeProps) {
               />
             </form>
 
-            <Link className="invite-member" to="/members">
+            <Link className="invite-member" to={`/profile?workspace=${workspaceId}`}>
               <img src="/user-plus0.svg" alt="" width={15} height={15} />
               Invite member
             </Link>
@@ -465,16 +481,25 @@ function UpdateRow({ row }: { row: RecentUpdate }) {
   )
 }
 
-function MemberAvatar({ person, index }: { person: Person; index: number }) {
+function MemberAvatar({
+  person,
+  index,
+  workspaceId,
+}: {
+  person: Person
+  index: number
+  workspaceId: WorkspaceId
+}) {
   return (
-    <span
+    <Link
       className="person-avatar"
+      to={profilePath(person.name, workspaceId)}
       title={person.name}
-      aria-label={person.name}
+      aria-label={`${person.name} profile`}
       style={{ background: AVATAR_TONES[index % AVATAR_TONES.length] }}
     >
       {person.initials}
-    </span>
+    </Link>
   )
 }
 
