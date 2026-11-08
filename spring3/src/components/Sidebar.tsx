@@ -4,6 +4,7 @@ import { documentsPath } from '../data/documents'
 import { directoryPath } from '../data/profiles'
 import { switcherTree, workspaceFromLocation, type SwitcherEntry } from '../data/workspaces'
 import Menu from './Menu'
+import { applyTheme, readTheme, themes, type ThemeId } from '../theme'
 
 const createItems = [
   {
@@ -76,6 +77,13 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
   const workspace = workspaceFromLocation(location.pathname, location.search)
   const tree = switcherTree(workspace)
   const [switcherOpen, setSwitcherOpen] = useState(false)
+  const [appearanceOpen, setAppearanceOpen] = useState(false)
+  const [theme, setTheme] = useState<ThemeId>(() => readTheme())
+
+  function chooseTheme(next: ThemeId) {
+    applyTheme(next)
+    setTheme(next)
+  }
 
   function onSwitcherClick() {
     if (collapsed) {
@@ -202,8 +210,43 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
             />
           ))}
         </nav>
-      </div>
+    <div className="mobile-theme-selector">
+      <button
+        type="button"
+        className="appearance-toggle"
+        aria-expanded={appearanceOpen}
+        aria-controls="appearance-options"
+        onClick={() => setAppearanceOpen((open) => !open)}
+      >
+        <span>Appearance</span>
+        <span aria-hidden="true">{appearanceOpen ? '⌃' : '⌄'}</span>
+      </button>
 
+      {appearanceOpen && (
+        <div
+          id="appearance-options"
+          className="mobile-theme-options"
+          role="group"
+          aria-label="Choose theme"
+        >
+          {themes.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              aria-pressed={theme === option.id}
+              onClick={() => chooseTheme(option.id)}
+            >
+              <span
+                className={`theme-swatch is-${option.id}`}
+                aria-hidden="true"
+              />
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
       <Link className="ask-weaver" to="/ask" onClick={closeMenu} aria-label="Ask Weaver">
         <img className="ask-weaver-label" src="/ask-weaver.svg" alt="Ask Weaver" width={135} height={40} />
         <img className="ask-weaver-mark" src="/weaver-mark-scribe.svg" alt="" width={40} height={40} />
