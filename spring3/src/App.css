@@ -1898,7 +1898,7 @@ a.header-search-toggle {
 .menu-panel {
   position: absolute;
   top: calc(100% + 4px);
-  left: 0;
+  right: 0;
   z-index: 30;
   min-width: 100%;
   padding: 6px;
