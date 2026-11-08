@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useSearch, type SearchHit } from '../data/search'
@@ -14,6 +14,11 @@ function SearchPage() {
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
   const [draft, setDraft] = useState(query)
+
+  useEffect(() => {
+    setDraft(query)
+  }, [query])
+  
   const results = useSearch(query)
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
