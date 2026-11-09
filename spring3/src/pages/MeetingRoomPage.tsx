@@ -105,6 +105,7 @@ function MeetingRoomPage() {
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const [tool, setTool] = useState<Tool>('setup')
+  const [editingAgenda, setEditingAgenda] = useState(false)
   const [reportsOpen, setReportsOpen] = useState(params.get('reports') === '1')
   const [selectedAgenda, setSelectedAgenda] = useState<string | null>(null)
   const [now, setNow] = useState(Date.now())
@@ -323,22 +324,74 @@ function MeetingRoomPage() {
 
           <section className="rail-card" aria-labelledby="agenda-rail-title">
             <h2 id="agenda-rail-title">Agenda</h2>
+
+            <button
+              className="chip"
+              type="button"
+              aria-pressed={editingAgenda}
+              onClick={() => setEditingAgenda((editing) => !editing)}
+            >
+              {editingAgenda ? 'Done Editing' : 'Edit Agenda'}
+            </button>
             <ul className="agenda-rail">
               {current.agenda.map((item, index) => (
                 <li key={item.id}>
+                  {editingAgenda ? (
+                      <div className="agenda-card">
+                        <input
+                          type="text"
+                          aria-label={`Edit agenda item ${index + 1}`}
+                          value={item.title}
+                          onChange={(event) => {
+                            saveMeeting({
+                              ...current,
+                              agenda: current.agenda.map((agendaItem) =>
+                                agendaItem.id === item.id
+                                  ? { ...agendaItem, title: event.target.value }
+                                  : agendaItem
+                              ),
+                            })
+                          }}
+                        />
+                        <label>
+                        <span>Duration (minutes)</span>
+                        <input
+                          type="number"
+                          min="1"
+                          aria-label={`Duration for ${item.title}`}
+                          value={item.minutes}
+                          onChange={(event) => {
+                            const minutes = Number(event.target.value)
+
+                            if (!Number.isInteger(minutes) || minutes < 1) return
+
+                            saveMeeting({
+                              ...current,
+                              agenda: current.agenda.map((agendaItem) =>
+                                agendaItem.id === item.id
+                                  ? { ...agendaItem, minutes }
+                                  : agendaItem
+                              ),
+                            })
+                          }}
+                        />
+                      </label>
+                      </div>
+                    ) : (
                   <button
                     className={`agenda-card${selected?.id === item.id ? ' selected' : ''}${item.timerRunning ? ' running' : ''}${item.timerRunning && liveActual(item, now) > item.minutes ? ' overtime' : ''}`}
                     type="button"
                     onClick={() => setSelectedAgenda(item.id)}
                   >
-                    <strong>
-                      {index + 1}. {item.title}
-                    </strong>
+                      <strong>
+                        {index + 1}. {item.title}
+                      </strong>
                     <span>
                       {item.minutes} min · Actual: {displayActualShort(item, now)}
                     </span>
                   </button>
-                  {selected?.id === item.id && !timersOff ? (
+                )}
+                  {selected?.id === item.id && !timersOff && !editingAgenda ? (
                     <div className="agenda-timer-actions">
                       {item.timerRunning ? (
                         <button className="chip" type="button" onClick={() => stopAgendaItem(current.id, item.id)}>
@@ -351,6 +404,33 @@ function MeetingRoomPage() {
                       )}
                     </div>
                   ) : null}
+                  {editingAgenda && (
+                    <button
+                      className="chip"
+                      type="button"
+                      aria-label={`Remove ${item.title} from agenda`}
+                      onClick={() => {
+                        const confirmed = window.confirm(
+                          `Remove "${item.title}" from this agenda?`
+                        )
+
+                        if (!confirmed) return
+
+                        saveMeeting({
+                          ...current,
+                          agenda: current.agenda.filter(
+                            (agendaItem) => agendaItem.id !== item.id
+                          ),
+                        })
+
+                        if (selectedAgenda === item.id) {
+                          setSelectedAgenda(null)
+                        }
+                      }}
+                  >
+                    Remove
+                  </button>
+                  )}
                 </li>
               ))}
             </ul>

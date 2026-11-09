@@ -106,6 +106,10 @@
   font-size: 12px;
 }
 
+.mobile-theme-selector {
+  display: none;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -2043,6 +2047,26 @@ a.header-search-toggle {
 .people-settings:focus-visible {
   outline-color: var(--accent);
 }
+
+/* Agenda editing fields */
+.agenda-rail .agenda-card {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.agenda-rail .agenda-card input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.agenda-rail .agenda-card label {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 
 /* --------------------------------------------------------------------------
    Viewports
