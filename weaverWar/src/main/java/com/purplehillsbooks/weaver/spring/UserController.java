@@ -30,6 +30,7 @@ import com.purplehillsbooks.weaver.AuthRequest;
 import com.purplehillsbooks.weaver.Cognoscenti;
 import com.purplehillsbooks.weaver.IdGenerator;
 import com.purplehillsbooks.weaver.MicroProfileMgr;
+import com.purplehillsbooks.weaver.NGPageIndex;
 import com.purplehillsbooks.weaver.NGWorkspace;
 import com.purplehillsbooks.weaver.ProfileRef;
 import com.purplehillsbooks.weaver.RoleRequestRecord;
@@ -59,6 +60,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class UserController extends BaseController {
 
     ////////////////////// MAIN VIEWS /////////////////////////
+
+    /** Who is logged in, plus the workspaces that person belongs to. */
+    @RequestMapping(value = "/session.json", method = RequestMethod.GET)
+    public void session(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        AuthRequest ar = AuthRequest.getOrCreate(request, response);
+        try {
+            JSONObject result = new JSONObject();
+            if (!ar.isLoggedIn()) {
+                result.put("loggedIn", false);
+                sendJson(ar, result);
+                return;
+            }
+            UserProfile user = ar.getUserProfile();
+            result.put("loggedIn", true);
+            result.put("user", user.getFullJSON());
+            JSONArray spaces = new JSONArray();
+            for (NGPageIndex ngpi : ar.getCogInstance().getWorkspacesUserIsIn(user)) {
+                spaces.put(ngpi.getJSON4List());
+            }
+            result.put("workspaces", spaces);
+            sendJson(ar, result);
+        } catch (Exception ex) {
+            Exception ee = CommonException.newWrap("Unable to read the current session.", ex);
+            streamException(ee, ar);
+        }
+    }
 
     @RequestMapping(value = "/{userKey}/UserHome.htm", method = RequestMethod.GET)
     public void userHome(
