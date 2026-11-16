@@ -1,6 +1,10 @@
+// React hooks, form typing, and routing utilities used on this page
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+
+// Discussion records, workspace context, session information, and write operations
+// Some imports provide demo values; keep these unchanges until the data integration is reviewed
 import { YOU } from '../data/documents'
 import {
   DEMO_COMPOSER,
@@ -14,8 +18,10 @@ import { useSession } from '../data/session'
 import { postDiscussion } from '../data/writes'
 import { openWorkspace } from '../data/live'
 
+// Supported list filters. Archived is handled separately from the visible filter buttons
 type FilterId = 'all' | DiscussionStatus | 'mine' | 'archived'
 
+// Labels for the primary discussion filter tabs
 const FILTERS: { id: FilterId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'open', label: 'Open' },
@@ -23,6 +29,7 @@ const FILTERS: { id: FilterId; label: string }[] = [
   { id: 'mine', label: 'Started by me' },
 ]
 
+// Wraps selected editor text with formatting markers and returns the new cursor position
 function wrapSelection(value: string, start: number, end: number, before: string, after: string) {
   const selected = value.slice(start, end) || 'text'
   const next = `${value.slice(0, start)}${before}${selected}${after}${value.slice(end)}`
@@ -30,16 +37,22 @@ function wrapSelection(value: string, start: number, end: number, before: string
   return { next, cursor }
 }
 
+// Main page: resolves workspace content, manages the composer, and renders discussions
 function DiscussionsPage() {
+  // Resolve the signed-in user and current workspace from the URL
   const [params] = useSearchParams()
   const session = useSession()
   const you = session.status === 'signed-in' ? session.user : null
   const workspace = workspaceFromLocation('/discussions', params.toString() ? `?${params.toString()}` : '')
   const requestedWorkspace = params.get('workspace')
+
+  // Limit the loaded discussions when a workspace filter is provided in the URL
   const discussions = useDiscussions().filter(
     (row) => !requestedWorkspace || row.workspaceId === requestedWorkspace,
   )
 
+  // Ask the backend to open the workspace when session and workspace keys are available
+  // A failed request does not clear discussions that were already loaded
   useEffect(() => {
     if (!you || !workspace.siteKey || !workspace.pageKey) {
       return
@@ -49,6 +62,7 @@ function DiscussionsPage() {
     })
   }, [you, workspace.siteKey, workspace.pageKey])
 
+  // Local UI state: list controls, composer fields, and submission feedback
   const [filter, setFilter] = useState<FilterId>('all')
   const [query, setQuery] = useState('')
   const [composerOpen, setComposerOpen] = useState(params.get('new') === '1')
@@ -58,12 +72,14 @@ function DiscussionsPage() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
+  // Support direct links that open the new discussion composer (?new=1)
   useEffect(() => {
     if (params.get('new') === '1') {
       setComposerOpen(true)
     }
   }, [params])
 
+  // Calculate the badge counts shown beside the discussion filters
   const counts: Record<FilterId, number> = {
     all: discussions.length,
     open: discussions.filter((row) => row.status === 'open').length,
@@ -72,6 +88,7 @@ function DiscussionsPage() {
     archived: 0,
   }
 
+  // Apply the selected status/ownership filter abd case-insensitive text search
   const visible = useMemo(() => {
     const search = query.trim().toLowerCase()
     return discussions.filter((row) => {
@@ -91,18 +108,21 @@ function DiscussionsPage() {
     })
   }, [discussions, filter, query])
 
+  // Restore the composer defaults after closing or successfully submitting
   function resetComposer() {
     setSubject(DEMO_COMPOSER.subject)
     setBody(DEMO_COMPOSER.body)
     setNotify(true)
   }
 
+  // Hide the composer and clear any previous validation error
   function closeComposer() {
     setComposerOpen(false)
     resetComposer()
     setFormError('')
   }
 
+  // Insert lightweight markup around the textarea selection, then restore focus
   function applyMarkup(before: string, after: string) {
     const field = document.getElementById('discussion-body') as HTMLTextAreaElement | null
     const start = field?.selectionStart ?? body.length
@@ -115,6 +135,8 @@ function DiscussionsPage() {
     })
   }
 
+  // Validate and submit a new discussion as either a draft or published topic
+  // The clicked submit button determines which action is requested
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const intent = (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value')
@@ -147,6 +169,7 @@ function DiscussionsPage() {
     }
   }
 
+  // Page layout: breadcrumbs, composer, list controls, and discussion results
   return (
     <section className="doc-library discussions">
       <header className="doc-library-head">
@@ -175,6 +198,7 @@ function DiscussionsPage() {
         </p>
       </header>
 
+      {/* Show the editable composer or the compact new-discussion starter */}
       {composerOpen ? (
         <form className="discussion-composer" onSubmit={onSubmit}>
           <div className="discussion-composer-head">
@@ -190,6 +214,7 @@ function DiscussionsPage() {
             </button>
           </div>
 
+        {/* Subject field and short-description editor */}
           <div className="discussion-composer-grid">
             <label className="discussion-field">
               <span>
@@ -233,6 +258,7 @@ function DiscussionsPage() {
             </label>
           </div>
 
+        {/* Notification preference and draft/publish actions */}
           <div className="discussion-composer-foot">
             <label className="discussion-notify">
               <input type="checkbox" checked={notify} onChange={(event) => setNotify(event.target.checked)} />
@@ -267,6 +293,7 @@ function DiscussionsPage() {
         </div>
       )}
 
+      {/* Status filters, text search, and the existing sort control */}
       <div className="doc-toolbar">
         <div className="doc-filters" role="tablist" aria-label="Discussion status">
           {FILTERS.map((item) => (
@@ -312,6 +339,7 @@ function DiscussionsPage() {
         </label>
       </div>
 
+      {/* Desktop-oriented results table; mobile presentation will be reviewed separately */}
       <div className="panel docs-table-card">
         <table className="docs-table discussions-table">
           <caption className="visually-hidden">Discussions in {workspace.name}</caption>
@@ -347,6 +375,7 @@ function DiscussionsPage() {
   )
 }
 
+// Renders one discussion's topic, status, author, reply count, and activity
 function DiscussionRow({ row }: { row: Discussion }) {
   return (
     <tr>
