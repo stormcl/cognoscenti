@@ -4607,6 +4607,23 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   font-size: 13px;
 }
 
+/* Introductory instructions are mobile-only */
+.discussions .discussion-composer-intro {
+  display: none;
+}
+
+/* Desktop composer author information */
+.discussions .discussion-composer-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hide mobile heading on desktop */
+.discussions .discussion-mobile-title {
+  display: none;
+}
+
 .discussion-composer-grid {
   display: grid;
   grid-template-columns: minmax(220px, 280px) 1fr;
@@ -4665,6 +4682,15 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   border: 0;
   border-radius: 0;
   resize: vertical;
+}
+
+/* Guidance beneath the discussion description */
+.discussion-description-help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .discussion-toolbar {
@@ -4840,30 +4866,199 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   display: none;
 }
 
+@keyframes discussion-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .discussions .discussion-composer {
+    animation: none;
+  }
+}
+
+/* Subject helper text and character counter */
+.discussion-subject-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.discussion-subject-help {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.discussion-subject-footer .discussion-count {
+  flex-shrink: 0;
+}
+
+/* Notification switch */
+.discussions .discussion-notify {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  cursor: pointer;
+}
+
+/* Visually hide checkbox while keeping it accessible */
+.discussions .discussion-notify input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Switch track */
+.discussions .discussion-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: #8b929c;
+  transition: background 150ms ease;
+}
+
+/* Switch thumb */
+.discussions .discussion-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 150ms ease;
+}
+
+/* On state */
+.discussions .discussion-notify input:checked + .discussion-switch {
+  background: #4073aa;
+}
+
+.discussions .discussion-notify input:checked + .discussion-switch::after {
+  transform: translateX(20px);
+}
+
+/* Visible keyboard focus */
+.discussions .discussion-notify input:focus-visible + .discussion-switch {
+  outline: 3px solid #4073aa;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discussions .discussion-switch,
+  .discussions .discussion-switch::after {
+    transition: none;
+  }
+}
+
 /* Mobile Discussions */
-@media (max-width: 767px) {
-  /* Mobile: full-screen discussion composer */
+  @media (max-width: 767px) {
+  /* Mobile bottom sheet */
   .discussions .discussion-composer {
     position: fixed;
-    margin: 0;
-    inset: 0;
+    inset: auto 0 0;
     z-index: 1000;
+
     display: flex;
     flex-direction: column;
     gap: 20px;
+
     width: 100%;
-    height: 100dvh;
-    overflow-y: auto;
+    height: 94dvh;
+    max-height: 94dvh;
+    margin: 0;
     padding: 20px 16px;
-    border: none;
-    border-radius: 0;
-    background: var(--surface);
+
+    overflow-y: auto;
     box-sizing: border-box;
+
+    border: none;
+    border-radius: 24px 24px 0 0;
+    background: var(--surface);
+    box-shadow: 0 -8px 30px rgb(0 0 0 / 15%);
+
+    animation: discussion-slide-up 550ms ease-out both;
   }
 
-  /* Keep the modal heading at the top */
+  /* Dim the page behind the mobile bottom sheet */
+/* Dim the page behind the mobile bottom sheet */
+  .discussions:has(.discussion-composer)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgb(0 0 0 / 45%);
+  }
+
+  /* Visual handle for the mobile bottom sheet */
+  .discussions .discussion-composer::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 44px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  /* Mobile composer header */
   .discussions .discussion-composer-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    min-height: 48px;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Hide desktop author information */
+  .discussions .discussion-composer-head .discussion-composer-author {
+    display: none;
+  }
+
+  /* Show centered mobile title */
+  .discussions .discussion-composer-head .discussion-mobile-title {
+    display: block;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  /* Position Cancel on the left */
+  .discussions .discussion-composer-head .discussion-cancel {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+  }
+
+  .discussions .discussion-composer-intro {
+    display: block;
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   /* Stack the form fields */
@@ -4871,11 +5066,24 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Position actions near the bottom */
+  /* Mobile: notification stays above, buttons stay at bottom */
   .discussions .discussion-composer-foot {
-    margin-top: auto;
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    flex: 1;
+    gap: 16px;
+    margin-top: 0;
+  }
+
+  /* Push only the action buttons to the bottom */
+  .discussions .discussion-composer-actions {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    margin-top: auto;
+    margin-left: 0;
+    padding-bottom: 8px;
   }
 
   /* Arrange draft and publish buttons */
@@ -4885,8 +5093,15 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     margin-left: 0;
   }
 
+  /* Rounded mobile action buttons */
+  .discussions .discussion-composer-actions {
+    gap: 12px;
+  }
+
   .discussions .discussion-composer-actions button {
     flex: 1;
+    min-height: 48px;
+    border-radius: 12px;
   }
 
   /* Mobile modal Cancel button */
@@ -4913,6 +5128,69 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+
+  /* Hide the desktop discussion starter on mobile */
+  .discussions .discussion-starter {
+    display: none;
+  }
+
+  /* Display the mobile New button beside the heading */
+  .discussions .discussion-mobile-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 10px 16px;
+  }
+
+  /* Discussion titles remain accessible links */
+  .discussions .discussion-card-content h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .discussions .discussion-card-content h2 a:hover {
+    text-decoration: underline;
+  }
+
+  .discussions .discussion-card-content h2 a:focus-visible {
+    outline: 2px solid var(--primary, #4073aa);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Keep the heading and New button aligned */
+  .discussions .title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Keep discussion filters on one scrollable row */
+  .discussions .doc-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .discussions .doc-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .discussions .doc-filters button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Hide desktop sorting control on mobile */
+  .discussions .docs-select {
+    display: none;
   }
 }
 

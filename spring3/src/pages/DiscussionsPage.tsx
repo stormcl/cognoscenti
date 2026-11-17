@@ -293,7 +293,7 @@ function DiscussionsPage() {
           className="button-solid discussion-mobile-new"
           onClick={() => setComposerOpen(true)}
         >
-          <img src="/plus0.svg" alt="" width={14} height={14} />
+        <span aria-hidden="true">+</span>
           New
         </button>
       </div>
@@ -311,7 +311,9 @@ function DiscussionsPage() {
           aria-modal={true}
           aria-label="New discussion" 
           onSubmit={onSubmit}>
-          <div  className="discussion-composer-head">
+        <div className="discussion-composer-head">
+          {/* Desktop: author information */}
+          <div className="discussion-composer-author">
             <span className="person-avatar lg" aria-hidden="true">
               {YOU.initials}
             </span>
@@ -319,14 +321,25 @@ function DiscussionsPage() {
               <h2>New discussion</h2>
               <p>This posts in {workspace.name}.</p>
             </div>
-            <button 
-              className="doc-close discussion-cancel" 
-              type="button" 
-              aria-label="Close" 
-              onClick={closeComposer}>
-              Cancel
-            </button>
           </div>
+
+          {/* Mobile: sheet title */}
+          <h2 className="discussion-mobile-title">New discussion</h2>
+
+          <button
+            className="doc-close discussion-cancel"
+            type="button"
+            aria-label="Cancel new discussion"
+            onClick={closeComposer}
+          >
+            Cancel
+          </button>
+        </div>
+
+        <p className="discussion-composer-intro">
+          Give it a clear subject and a short summary.
+          The conversation starts after you publish.
+        </p>
 
         {/* Subject field and short-description editor */}
           <div className="discussion-composer-grid">
@@ -335,15 +348,22 @@ function DiscussionsPage() {
                 Subject <abbr title="required">*</abbr>
               </span>
               <input
-              ref={subjectRef}
+                placeholder="e.g. ‘Division of heuristic evaluation’"
+                ref={subjectRef}
                 value={subject}
                 maxLength={SUBJECT_LIMIT}
                 onChange={(event) => setSubject(event.target.value)}
                 required
               />
-              <span className="discussion-count">
-                {subject.length} / {SUBJECT_LIMIT}
-              </span>
+              <div className="discussion-subject-footer">
+                <span className="discussion-subject-help">
+                  A few words so others know what it's about
+                </span>
+
+                <span className="discussion-count">
+                  {subject.length} / {SUBJECT_LIMIT}
+                </span>
+              </div>
             </label>
 
             <label className="discussion-field">
@@ -368,16 +388,29 @@ function DiscussionsPage() {
                   value={body}
                   rows={4}
                   onChange={(event) => setBody(event.target.value)}
+                  placeholder="What should the group discuss, and why now?"
                 />
               </div>
+
+              <p className="discussion-description-help">
+                Keep it brief. Replies go inside the discussion.
+              </p> 
             </label>
           </div>
 
         {/* Notification preference and draft/publish actions */}
           <div className="discussion-composer-foot">
             <label className="discussion-notify">
-              <input type="checkbox" checked={notify} onChange={(event) => setNotify(event.target.checked)} />
-              Notify workspace members when published
+              <span>Notify workspace members when published</span>
+
+              <input
+                type="checkbox"
+                role="switch"
+                checked={notify}
+                onChange={(event) => setNotify(event.target.checked)}
+              />
+
+              <span className="discussion-switch" aria-hidden="true" />
             </label>
             <div className="discussion-composer-actions">
               <button className="button-light docs-secondary" type="button" onClick={closeComposer} disabled={saving}>
@@ -529,7 +562,11 @@ function DiscussionCard ({ row }: { row: Discussion}) {
 
       {/* Discussion title and summary */}
       <div className="discussion-card-content">
-        <h2>{row.title}</h2>
+        <h2>
+          <Link to={`/discussions/${row.id}`}>
+            {row.title}
+          </Link>
+        </h2>
         <p>{row.summary}</p>
       </div>
 

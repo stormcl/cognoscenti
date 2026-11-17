@@ -2,6 +2,7 @@ import { Outlet, Route, Routes } from 'react-router-dom'
 import WorkspaceLayout from './components/WorkspaceLayout'
 import AttendanceHistoryPage from './pages/AttendanceHistoryPage'
 import DiscussionsPage from './pages/DiscussionsPage'
+import DiscussionDetailPage from './pages/DiscussionDetailPage'
 import DocumentsPage from './pages/DocumentsPage'
 import MeetingRoomPage from './pages/MeetingRoomPage'
 import MeetingsIndexPage from './pages/MeetingsIndexPage'
@@ -44,6 +45,7 @@ function App() {
         <Route path="/meetings/attendance" element={<AttendanceHistoryPage />} />
         <Route path="/meetings/:id" element={<MeetingRoomPage />} />
         <Route path="/discussions" element={<DiscussionsPage />} />
+        <Route path="/discussions/:id" element={<DiscussionDetailPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/action-items" element={<ActionItemsPage />} />
         <Route path="/notes" element={<NotesPage />} />
