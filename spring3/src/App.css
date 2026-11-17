@@ -4512,7 +4512,7 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   cursor: pointer;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 767px) {
   .doc-drop,
   .doc-modal-grid {
     flex-direction: column;
@@ -4541,10 +4541,6 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   .discussion-starter {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .discussion-composer-grid {
-    display: flex;
   }
 }
 
@@ -4787,6 +4783,143 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   margin-left: auto;
 }
 
+/* Hide mobile discussion cards on desktop */
+.discussion-mobile-list {
+  display: none;
+}
+
+/* Mobile discussion card layout */
+.discussion-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.discussion-card-head,
+.discussion-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discussion-card-head .docs-more {
+  margin-left: auto;
+}
+
+.discussion-card-content h2 {
+  margin: 0 0 4px;
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.discussion-card-content p {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.discussion-card-foot {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.discussion-card-activity {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Hide mobile New button on desktop */
+.discussion-mobile-new {
+  display: none;
+}
+
+/* Mobile Discussions */
+@media (max-width: 767px) {
+  /* Mobile: full-screen discussion composer */
+  .discussions .discussion-composer {
+    position: fixed;
+    margin: 0;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    height: 100dvh;
+    overflow-y: auto;
+    padding: 20px 16px;
+    border: none;
+    border-radius: 0;
+    background: var(--surface);
+    box-sizing: border-box;
+  }
+
+  /* Keep the modal heading at the top */
+  .discussions .discussion-composer-head {
+    flex-shrink: 0;
+  }
+
+  /* Stack the form fields */
+  .discussions .discussion-composer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Position actions near the bottom */
+  .discussions .discussion-composer-foot {
+    margin-top: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Arrange draft and publish buttons */
+  .discussions .discussion-composer-actions {
+    display: flex;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .discussions .discussion-composer-actions button {
+    flex: 1;
+  }
+
+  /* Mobile modal Cancel button */
+  .discussions .discussion-cancel {
+    width: auto;
+    height: auto;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* Hide the footer Cancel button on mobile */
+  .discussions .discussion-composer-actions button:first-child {
+    display: none;
+  }
+
+  /* Hide desktop table */
+  .discussions .docs-table-card {
+    display: none;
+  }
+
+  /* Display mobile discussion cards */
+  .discussion-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* ==================================================== 
+  Dark Theme - Icon Adjustments
+  Adjust icon filters for visibility against dark backgrounds
+  ===================================================== */
 html[data-theme='additional-dark'] .nav-item img,
 html[data-theme='additional-dark'] .workspace-switcher img,
 html[data-theme='additional-dark'] .workspace-name img,

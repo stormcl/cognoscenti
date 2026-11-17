@@ -1,5 +1,5 @@
 // React hooks, form typing, and routing utilities used on this page
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 
@@ -66,6 +66,11 @@ function DiscussionsPage() {
   const [filter, setFilter] = useState<FilterId>('all')
   const [query, setQuery] = useState('')
   const [composerOpen, setComposerOpen] = useState(params.get('new') === '1')
+
+  // References for mobile modal focus management
+  const subjectRef = useRef<HTMLInputElement>(null)
+  const newButtonRef = useRef<HTMLButtonElement>(null)
+  const composerRef = useRef<HTMLFormElement>(null)
   const [subject, setSubject] = useState(DEMO_COMPOSER.subject)
   const [body, setBody] = useState(DEMO_COMPOSER.body)
   const [notify, setNotify] = useState(true)
@@ -121,6 +126,94 @@ function DiscussionsPage() {
     resetComposer()
     setFormError('')
   }
+
+  // Allow users to close the composer with Escape
+  useEffect(() => {
+    if (!composerOpen) return
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        closeComposer()
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape)
+    }
+  }, [composerOpen])
+
+  // Prevent background scrolling while the mobile modal is open
+  useEffect(() => {
+    if (!composerOpen) return
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    if (!mediaQuery.matches) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [composerOpen])
+
+  // Move focus into the mobile modal and restore it when closed
+  useEffect(() => {
+    if (!composerOpen) return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+
+    const previousFocus = document.activeElement as HTMLElement | null
+
+    subjectRef.current?.focus()
+
+    return () => {
+      if (previousFocus?.isConnected) {
+        previousFocus.focus()
+      } else {
+        newButtonRef.current?.focus()
+      }
+    }
+  }, [composerOpen])
+
+  // Keep Tab navigation inside the mobile discussion modal
+  useEffect(() => {
+    if (!composerOpen) return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+
+    function handleTab(event: KeyboardEvent) {
+      if (event.key !== 'Tab') return
+
+      const composer = composerRef.current
+      if (!composer) return
+
+      const focusable = Array.from(
+        composer.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href]'
+        )
+      ).filter((element) => element.getClientRects().length > 0)
+
+      if (!focusable.length) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      if (event.shiftKey && (document.activeElement === first || !composer.contains(document.activeElement))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (document.activeElement === last || !composer.contains(document.activeElement))) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleTab)
+
+    return () => {
+      document.removeEventListener('keydown', handleTab)
+    }
+  }, [composerOpen])
 
   // Insert lightweight markup around the textarea selection, then restore focus
   function applyMarkup(before: string, after: string) {
@@ -189,10 +282,21 @@ function DiscussionsPage() {
             <span aria-current="page">Discussions</span>
           </span>
         </nav>
-        <div className="title-row">
-          <h1>Discussions</h1>
-          <span className="count-pill">{discussions.length}</span>
-        </div>
+      <div className="title-row">
+        <h1>Discussions</h1>
+        <span className="count-pill">{discussions.length}</span>
+
+        {/* Mobile: new discussion action beside the heading */}
+        <button
+        ref={newButtonRef}
+          type="button"
+          className="button-solid discussion-mobile-new"
+          onClick={() => setComposerOpen(true)}
+        >
+          <img src="/plus0.svg" alt="" width={14} height={14} />
+          New
+        </button>
+      </div>
         <p className="description">
           Start a topic for the group right here. Drafts are visible only to you until you publish them.
         </p>
@@ -200,8 +304,14 @@ function DiscussionsPage() {
 
       {/* Show the editable composer or the compact new-discussion starter */}
       {composerOpen ? (
-        <form className="discussion-composer" onSubmit={onSubmit}>
-          <div className="discussion-composer-head">
+        <form 
+          ref={composerRef}
+          className="discussion-composer"
+          role="dialog"
+          aria-modal={true}
+          aria-label="New discussion" 
+          onSubmit={onSubmit}>
+          <div  className="discussion-composer-head">
             <span className="person-avatar lg" aria-hidden="true">
               {YOU.initials}
             </span>
@@ -209,8 +319,12 @@ function DiscussionsPage() {
               <h2>New discussion</h2>
               <p>This posts in {workspace.name}.</p>
             </div>
-            <button className="doc-close" type="button" aria-label="Close" onClick={closeComposer}>
-              ×
+            <button 
+              className="doc-close discussion-cancel" 
+              type="button" 
+              aria-label="Close" 
+              onClick={closeComposer}>
+              Cancel
             </button>
           </div>
 
@@ -221,6 +335,7 @@ function DiscussionsPage() {
                 Subject <abbr title="required">*</abbr>
               </span>
               <input
+              ref={subjectRef}
                 value={subject}
                 maxLength={SUBJECT_LIMIT}
                 onChange={(event) => setSubject(event.target.value)}
@@ -371,7 +486,68 @@ function DiscussionsPage() {
           Showing {visible.length} of {discussions.length} discussions
         </p>
       </div>
+
+      {/* Mobile discussion cards */}
+      <div className="discussion-mobile-list">
+        {visible.length ? (
+          visible.map((row) => (
+            <DiscussionCard key={row.id} row={row} />
+          ))
+        ) : (
+          <p className="docs-empty">
+            No discussions match these filters.
+          </p>
+        )}
+      </div>
     </section>
+  )
+}
+
+// Mobile discussion card based on the UX team's mid-fi design
+function DiscussionCard ({ row }: { row: Discussion}) {
+  return (
+    <article className="discussion-card">
+      {/* Stautus, last activity, and actions */}
+      <div className="discussion-card-head">
+        <span className={`discussion-status is-${row.status}`}>
+          <span className="discussion-status-dot" aria-hidden="true" />
+          {row.status === 'open' ? 'Open' : 'Draft'}
+        </span>
+
+        <span className="discussion-card-activity">
+          {row.lastActivity}
+        </span>
+
+        <button
+          type="button"
+          className="docs-more"
+          aria-label={`More actions for ${row.title}`}
+          >
+            ...
+          </button>
+      </div>
+
+      {/* Discussion title and summary */}
+      <div className="discussion-card-content">
+        <h2>{row.title}</h2>
+        <p>{row.summary}</p>
+      </div>
+
+      {/* Author and reply count */}
+      <div className="discussion-card-foot">
+        <span className="doc-owner">
+          <span className="person-avatar" aria-hidden="true">
+            {row.authorInitials}
+          </span>
+          {row.authorName}
+        </span>
+
+        <span className="discussion-replies">
+          <img src="/msg0.svg" alt="" width={14} height={14} />
+          {row.replies == null ? '-' : `${row.replies} replies`}
+        </span>
+      </div>
+    </article>
   )
 }
 
@@ -379,7 +555,7 @@ function DiscussionsPage() {
 function DiscussionRow({ row }: { row: Discussion }) {
   return (
     <tr>
-      <td>
+      <td data-label="Topic">
         <div className="discussion-topic">
           <span className="discussion-topic-icon" aria-hidden="true">
             <img src="/msg0.svg" alt="" width={16} height={16} />
@@ -390,28 +566,37 @@ function DiscussionRow({ row }: { row: Discussion }) {
           </span>
         </div>
       </td>
-      <td>
+
+      <td data-label="Status">
         <span className={`discussion-status is-${row.status}`}>
           <span className="discussion-status-dot" aria-hidden="true" />
           {row.status === 'open' ? 'Open' : 'Draft'}
         </span>
       </td>
-      <td>
+
+      <td data-label="Started by">
         <span className="doc-owner">
           <span className="person-avatar">{row.authorInitials}</span>
           {row.authorName}
         </span>
       </td>
-      <td>
+
+      <td data-label="Replies">
         <span className="discussion-replies">
           <img src="/msg0.svg" alt="" width={14} height={14} />
           {row.replies == null ? '—' : row.replies}
         </span>
       </td>
-      <td>{row.lastActivity}</td>
-      <td>
-        <button className="docs-more" type="button" aria-label={`More actions for ${row.title}`}>
-          ···
+
+      <td data-label="Last activity">{row.lastActivity}</td>
+
+      <td data-label="Actions">
+        <button 
+          className="docs-more" 
+          type="button" 
+          aria-label={`More actions for ${row.title}`}
+        >
+          ...
         </button>
       </td>
     </tr>
