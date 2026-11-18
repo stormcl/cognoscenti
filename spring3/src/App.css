@@ -4557,10 +4557,64 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 }
 
 .discussion-composer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+
+  width: min(750px, calc(100vw - 48px));
+  max-height: 90dvh;
+  overflow-y: auto;
+
+  transform: translate(-50%, -50%);
+
   flex-direction: column;
   align-items: stretch;
   gap: 16px;
   padding: 18px 18px 16px;
+
+  box-shadow: 0 16px 48px rgb(0 0 0 / 20%);
+}
+
+/* Discussion modal header icon */
+.discussions .discussion-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 20px;
+}
+
+/* Discussion modal close button */
+.discussions .discussion-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.discussions .discussion-close:hover {
+  background: var(--accent-bg);
+}
+
+.discussions .discussion-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .discussion-starter-input {
@@ -4607,6 +4661,14 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   font-size: 13px;
 }
 
+/* Desktop discussion modal header */
+.discussions .discussion-composer-head {
+  background: var(--accent-bg);
+  padding: 16px 18px;
+  margin: -18px -18px 0;
+  border-radius: 12px 12px 0 0;
+}
+
 /* Introductory instructions are mobile-only */
 .discussions .discussion-composer-intro {
   display: none;
@@ -4626,7 +4688,7 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 
 .discussion-composer-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -4904,9 +4966,11 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 
 /* Notification switch */
 .discussions .discussion-notify {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   padding: 14px;
   border-radius: 12px;
@@ -4926,6 +4990,7 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 .discussions .discussion-switch {
   position: relative;
   flex-shrink: 0;
+  margin-left: auto;
   width: 48px;
   height: 28px;
   border-radius: 999px;
@@ -4947,24 +5012,114 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 }
 
 /* On state */
-.discussions .discussion-notify input:checked + .discussion-switch {
+.discussions .discussion-notify input:checked ~ .discussion-switch {
+  margin-left: auto;
   background: #4073aa;
 }
 
-.discussions .discussion-notify input:checked + .discussion-switch::after {
+.discussions .discussion-notify input:checked ~ .discussion-switch::after {
   transform: translateX(20px);
 }
 
 /* Visible keyboard focus */
-.discussions .discussion-notify input:focus-visible + .discussion-switch {
+.discussions .discussion-notify input:focus-visible ~ .discussion-switch {
   outline: 3px solid #4073aa;
   outline-offset: 3px;
+}
+
+/* Dim the Discussions page when the composer is open */
+.discussions:has(.discussion-composer)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgb(0 0 0 / 45%);
+}
+
+/* Desktop composer Cancel button */
+.discussions .discussion-cancel {
+  width: auto;
+  height: auto;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .discussions .discussion-switch,
   .discussions .discussion-switch::after {
     transition: none;
+  }
+}
+
+/* Desktop discussion modal footer */
+@media (min-width: 768px) {
+  .discussions .discussion-composer-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .discussions .discussion-composer-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-left: 0;
+    gap: 8px;
+  }
+
+  .discussions .discussion-composer-actions .discussion-cancel {
+    margin-right: auto;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+  }
+
+  .discussions .discussion-composer-actions .discussion-cancel:hover {
+    color: var(--text-h);
+    background: var(--accent-soft);
+  }
+}
+
+/* Desktop notification checkbox */
+@media (min-width: 768px) {
+  .discussions .discussion-notify .discussion-switch {
+    display: none;
+  }
+
+  .discussions .discussion-desktop-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+
+  .discussions .discussion-notify input:checked ~ .discussion-desktop-check::after {
+    content: "✓";
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .discussions .discussion-notify input:focus-visible ~ .discussion-desktop-check {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+/* Keep the desktop checkbox hidden on mobile */
+@media (max-width: 767px) {
+  .discussions .discussion-desktop-check {
+    display: none;
   }
 }
 
@@ -4995,16 +5150,6 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     box-shadow: 0 -8px 30px rgb(0 0 0 / 15%);
 
     animation: discussion-slide-up 550ms ease-out both;
-  }
-
-  /* Dim the page behind the mobile bottom sheet */
-/* Dim the page behind the mobile bottom sheet */
-  .discussions:has(.discussion-composer)::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    background: rgb(0 0 0 / 45%);
   }
 
   /* Visual handle for the mobile bottom sheet */
@@ -5076,32 +5221,24 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     margin-top: 0;
   }
 
-  /* Push only the action buttons to the bottom */
+
+  /* Mobile footer buttons */
   .discussions .discussion-composer-actions {
     display: flex;
     width: 100%;
     gap: 12px;
     margin-top: auto;
     margin-left: 0;
-    padding-bottom: 8px;
-  }
-
-  /* Arrange draft and publish buttons */
-  .discussions .discussion-composer-actions {
-    display: flex;
-    width: 100%;
-    margin-left: 0;
-  }
-
-  /* Rounded mobile action buttons */
-  .discussions .discussion-composer-actions {
-    gap: 12px;
+    padding-bottom: 20px;
   }
 
   .discussions .discussion-composer-actions button {
     flex: 1;
-    min-height: 48px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
     border-radius: 12px;
+    font-size: 14px;
   }
 
   /* Mobile modal Cancel button */

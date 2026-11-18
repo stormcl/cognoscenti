@@ -312,34 +312,33 @@ function DiscussionsPage() {
           aria-label="New discussion" 
           onSubmit={onSubmit}>
         <div className="discussion-composer-head">
-          {/* Desktop: author information */}
+          {/* Desktop modal header */}
           <div className="discussion-composer-author">
-            <span className="person-avatar lg" aria-hidden="true">
-              {YOU.initials}
-            </span>
+            <span className="discussion-header-icon" aria-hidden="true">♧</span>
+
             <div>
-              <h2>New discussion</h2>
-              <p>This posts in {workspace.name}.</p>
+              <h2>New discussion topic</h2>
+              <p>
+                Give it a clear subject and a short summary.
+                The conversation starts after you publish.
+              </p>
             </div>
           </div>
 
-          {/* Mobile: sheet title */}
+          {/* Mobile bottom-sheet title */}
           <h2 className="discussion-mobile-title">New discussion</h2>
 
+          {/* Desktop close button */}
           <button
-            className="doc-close discussion-cancel"
             type="button"
-            aria-label="Cancel new discussion"
+            className="discussion-close"
+            aria-label="Close new discussion"
             onClick={closeComposer}
+            disabled={saving}
           >
-            Cancel
+            ×
           </button>
         </div>
-
-        <p className="discussion-composer-intro">
-          Give it a clear subject and a short summary.
-          The conversation starts after you publish.
-        </p>
 
         {/* Subject field and short-description editor */}
           <div className="discussion-composer-grid">
@@ -400,9 +399,8 @@ function DiscussionsPage() {
 
         {/* Notification preference and draft/publish actions */}
           <div className="discussion-composer-foot">
+            
             <label className="discussion-notify">
-              <span>Notify workspace members when published</span>
-
               <input
                 type="checkbox"
                 role="switch"
@@ -410,10 +408,14 @@ function DiscussionsPage() {
                 onChange={(event) => setNotify(event.target.checked)}
               />
 
+              <span className="discussion-desktop-check" aria-hidden="true" />
+
+              <span>Notify workspace members when published</span>
+
               <span className="discussion-switch" aria-hidden="true" />
             </label>
             <div className="discussion-composer-actions">
-              <button className="button-light docs-secondary" type="button" onClick={closeComposer} disabled={saving}>
+              <button className="button-light docs-secondary discussion-cancel" type="button" onClick={closeComposer} disabled={saving}>
                 Cancel
               </button>
               <button className="button-light docs-secondary" type="submit" value="draft" disabled={saving}>
@@ -563,9 +565,9 @@ function DiscussionCard ({ row }: { row: Discussion}) {
       {/* Discussion title and summary */}
       <div className="discussion-card-content">
         <h2>
-          <Link to={`/discussions/${row.id}`}>
-            {row.title}
-          </Link>
+        <Link to={`/discussions/${row.id}${window.location.search}`}>
+          {row.title}
+        </Link>
         </h2>
         <p>{row.summary}</p>
       </div>
@@ -598,7 +600,9 @@ function DiscussionRow({ row }: { row: Discussion }) {
             <img src="/msg0.svg" alt="" width={16} height={16} />
           </span>
           <span>
-            <strong>{row.title}</strong>
+            <Link to={`/discussions/${row.id}${window.location.search}`}>
+              <strong>{row.title}</strong>
+            </Link>
             <span>{row.summary}</span>
           </span>
         </div>
