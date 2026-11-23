@@ -5,7 +5,7 @@ import { directoryPath } from '../data/profiles'
 import { initialsFor, loginRedirect, useSession } from '../data/session'
 import { switcherTree, useWorkspaces, workspaceFromLocation, type SwitcherEntry } from '../data/workspaces'
 import Menu from './Menu'
-import { applyTheme, readTheme, themes, type ThemeId } from '../theme'
+import { applyTheme, experimentalThemes, mainThemes, readTheme, type ThemeId } from '../theme'
 
 const createItems = [
   {
@@ -99,8 +99,7 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
   const [theme, setTheme] = useState<ThemeId>(() => readTheme())
 
   function chooseTheme(next: ThemeId) {
-    applyTheme(next)
-    setTheme(next)
+    setTheme(applyTheme(next))
   }
 
   function onSwitcherClick() {
@@ -259,7 +258,22 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
           role="group"
           aria-label="Choose theme"
         >
-          {themes.map((option) => (
+          {mainThemes.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              aria-pressed={theme === option.id}
+              onClick={() => chooseTheme(option.id)}
+            >
+              <span
+                className={`theme-swatch is-${option.id}`}
+                aria-hidden="true"
+              />
+              {option.label}
+            </button>
+          ))}
+          <p className="theme-group">Experimental</p>
+          {experimentalThemes.map((option) => (
             <button
               key={option.id}
               type="button"
