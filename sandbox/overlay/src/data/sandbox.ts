@@ -41,8 +41,7 @@ const TEAMS: Team[] = [
     circle: 'organization',
     code: 'IDA',
     name: 'IDA Class Workspace',
-    description:
-      'Aim: Parent workspace for the Integrated Digital Agency class. Coordinate all teams, shared planning, and class-wide resources.',
+    description: '',
     parent: true,
   },
   {
@@ -50,36 +49,35 @@ const TEAMS: Team[] = [
     circle: 'ux',
     code: 'UX',
     name: 'UX Team',
-    description:
-      'Aim: Redesign the Weaver workspace experience through heuristic evaluation, journey mapping and iterative wireframes.',
+    description: '',
   },
   {
     pageKey: 'dev',
     circle: 'dev',
     code: 'DT',
     name: 'Dev Team',
-    description: 'Aim: Build and maintain Weaver application features, APIs, and release quality.',
+    description: '',
   },
   {
     pageKey: 'branding',
     circle: 'branding',
     code: 'BT',
     name: 'Branding Team',
-    description: 'Aim: Keep Weaver visual identity consistent across product, decks, and marketing.',
+    description: '',
   },
   {
     pageKey: 'marketing',
     circle: 'marketing',
     code: 'MT',
     name: 'Marketing Team',
-    description: 'Aim: Tell the Weaver story across campaigns, launch notes, and public pages.',
+    description: '',
   },
   {
     pageKey: 'logistics',
     circle: 'logistics',
     code: 'LT',
     name: 'Logistics Team',
-    description: 'Aim: Coordinate events, supplies, rooms, and meeting operations for the organization.',
+    description: '',
   },
 ]
 
