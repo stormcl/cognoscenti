@@ -13,40 +13,42 @@ Desktop: 1024px and above
   Defines the base colors, status indicators, and typography
   Other themes override selected variables below 
 =============================================================== */
-:root {
+:root,
+html[data-theme='weaver-indigo'] {
   /* Text Colors */
-  --text: #3d5166;
-  --text-muted: #6a8094;
-  --text-h: #132a41;
+  --text: #1a2a3f;
+  --text-muted: #5a626e;
+  --text-h: #1a2a3f;
 
   /* Background and Borders */
-  --bg: #f3f7fb;
-  --surface: #ffffff;
-  --border: #c5d9e8;
+  --bg: #eef5fb;
+  --surface: #fbfbff;
+  --border: #e1e7ee;
 
-  /* Accent Colors */
-  --accent: #3e6fa6;
-  --accent-2: #87bbd7;
-  --accent-bg: #d6eaf6;
-  --accent-soft: #eaf4fb;
+  /* Accent Colors. Filled buttons use --accent with white text, so it stays navy. */
+  --accent: #1a2a3f;
+  --accent-2: #93bad4;
+  --accent-bg: #dceaf5;
+  --accent-soft: #eef5fb;
 
   /* Header and Footer */
-  --chrome: #132a41;
-  --chrome-footer: #132a41;
+  --chrome: #1a2a3f;
+  --chrome-footer: #151a21;
+  --mark-bg: #ffffff;
 
   /* Meeting Colors */
   --meeting: var(--accent);
   --on-meeting: #ffffff;
 
   /* User Availability Indicators */
-  --online: #00a03f;
-  --away: #f8b82f;
-  --busy: #cb0035;
-  --offline: #4a4a4a;
+  --online: #5da283;
+  --away: #f1bd6c;
+  --busy: #f06a6a;
+  --offline: #5a626e;
 
   /* Notifications and Errors */
-  --notify: #f8b82f;
-  --error: #cb0035;
+  --notify: #f1bd6c;
+  --error: #f06a6a;
 
   /* Scribe Colors */
   --scribe: #57175d;
@@ -62,6 +64,7 @@ Desktop: 1024px and above
 
   /* Typography */
   --sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --brand: "Montserrat", "Inter", system-ui, sans-serif;
 
   font: 16px/145% var(--sans);
   color: var(--text);
@@ -79,22 +82,81 @@ Desktop: 1024px and above
   Theme selection updates CSS variables without requiring separate styles for individual components
   =========================================================== */
 
-/* Alternate Blue Theme */
-html[data-theme='primary-2'] {
-  --text: #2c4a73;
-  --text-muted: #5d7696;
-  --text-h: #04285f;
-  --bg: #f2f8fb;
-  --border: #b7dce3;
-  --accent: #1b5bd1;
-  --accent-2: #1b97d1;
-  --accent-bg: #cbeef3;
-  --accent-soft: #e5f6f8;
-  --chrome: #003dad;
-  --chrome-footer: #003dad;
+/* Weaver Aqua (Light). Header is the secondary blue. */
+html[data-theme='weaver-aqua'] {
+  --text: #1a2a3f;
+  --text-muted: #5a626e;
+  --text-h: #1a2a3f;
+  --bg: #e3f5f9;
+  --surface: #fbfbff;
+  --border: #e1e7ee;
+  --accent: #2f7bb1;
+  --accent-2: #91d1e2;
+  --accent-bg: #e3f5f9;
+  --accent-soft: #eef5fb;
+  --chrome: #2f7bb1;
+  --chrome-footer: #1f5f8c;
+  --mark-bg: #ffffff;
+  --online: #5da283;
+  --away: #f1bd6c;
+  --busy: #f06a6a;
+  --notify: #f1bd6c;
+  --error: #f06a6a;
 }
 
-/* Dark Theme */
+/* Weaver Midnight (Dark). Navy page, white text at AA on the header and body. */
+html[data-theme='weaver-midnight'] {
+  color-scheme: dark;
+  --text: #fbfbff;
+  --text-muted: #c5cdd6;
+  --text-h: #ffffff;
+  --bg: #151a21;
+  --surface: #1c2430;
+  --border: #3a4452;
+  --accent: #2f7bb1;
+  --accent-2: #93bad4;
+  --accent-bg: #243044;
+  --accent-soft: #1a2433;
+  --chrome: #0f1620;
+  --chrome-footer: #0b1016;
+  --mark-bg: #1a2a3f;
+  --online: #7fcbaa;
+  --away: #f1bd6c;
+  --busy: #f6a0a0;
+  --notify: #f1bd6c;
+  --error: #f6a0a0;
+  --minutes-bg: #2a2418;
+  --minutes-ink: #fbf2de;
+  --minutes-border: #5a4a30;
+}
+
+/* Weaver Depth (Dark). Deep blue header, not a copy of Midnight. */
+html[data-theme='weaver-depth'] {
+  color-scheme: dark;
+  --text: #f4f8fb;
+  --text-muted: #c5d0d8;
+  --text-h: #ffffff;
+  --bg: #0e2433;
+  --surface: #143044;
+  --border: #2e5168;
+  --accent: #2f7bb1;
+  --accent-2: #91d1e2;
+  --accent-bg: #1a4560;
+  --accent-soft: #122c3e;
+  --chrome: #0a3148;
+  --chrome-footer: #071e2c;
+  --mark-bg: #1a2a3f;
+  --online: #7fcbaa;
+  --away: #f1bd6c;
+  --busy: #f6a0a0;
+  --notify: #f1bd6c;
+  --error: #f6a0a0;
+  --minutes-bg: #1d3340;
+  --minutes-ink: #e3f5f9;
+  --minutes-border: #2e5168;
+}
+
+/* Experimental: Dark Theme */
 html[data-theme='additional-dark'] {
   color-scheme: dark;
   --text: #d5d3de;
@@ -109,6 +171,7 @@ html[data-theme='additional-dark'] {
   --accent-soft: #221f2a;
   --chrome: #29262e;
   --chrome-footer: #14182c;
+  --mark-bg: #1a2a3f;
 
   /* Adjust meeting minutes for dark backgrounds */
   --minutes-bg: #585653;
@@ -116,7 +179,7 @@ html[data-theme='additional-dark'] {
   --minutes-border: #6e6c69;
 }
 
-/* Alternate Light Theme */
+/* Experimental: Alternate Light Theme */
 html[data-theme='additional-light'] {
   --text: #5c4650;
   --text-muted: #8a7080;
@@ -129,6 +192,7 @@ html[data-theme='additional-light'] {
   --accent-soft: #fff6df;
   --chrome: #e83e8c;
   --chrome-footer: #c43178;
+  --mark-bg: #ffffff;
 
   /* Meeting colors specific to this theme */
   --meeting: #f5a16c;

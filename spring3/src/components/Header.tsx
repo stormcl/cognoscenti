@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useNotices } from '../data/notices'
 import { profileHref } from '../data/profiles'
 import { initialsFor, loginRedirect, useSession } from '../data/session'
-import { applyTheme, brandMark, readTheme, themes, type ThemeId } from '../theme'
+import { applyTheme, brandMark, experimentalThemes, mainThemes, readTheme, type ThemeId } from '../theme'
 import Menu from './Menu'
 
 type HeaderProps = {
@@ -65,7 +65,7 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
         <span className="brand-logo" aria-hidden="true">
           <img src={brandMark(theme)} alt="" width={48} height={48} />
         </span>
-        <span className="brand-name">Weaver</span>
+        <img className="brand-name" src="/weaver-wordmark.svg" alt="Circle Weaver" />
       </Link>
 
       <form className="header-search" onSubmit={onSearch}>
@@ -125,7 +125,20 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
           </Link>
           <div className="menu-dev" data-keep-open>
             <p>Dev mode</p>
-            {themes.map((option) => (
+            {mainThemes.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="menuitemradio"
+                aria-checked={theme === option.id}
+                onClick={() => chooseTheme(option.id)}
+              >
+                <span className={`theme-swatch is-${option.id}`} aria-hidden="true" />
+                {option.label}
+              </button>
+            ))}
+            <p className="theme-group">Experimental</p>
+            {experimentalThemes.map((option) => (
               <button
                 key={option.id}
                 type="button"

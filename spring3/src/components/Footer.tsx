@@ -50,7 +50,7 @@ function Footer() {
           <span className="footer-mark" aria-hidden="true">
             <img src={brandMark(theme)} alt="" width={40} height={40} />
           </span>
-          Circle Weaver
+          <img className="brand-name" src="/weaver-wordmark.svg" alt="Circle Weaver" />
         </Link>
         <form className="footer-search" onSubmit={onSearch}>
           <img src="/search1.png" alt="" width={14} height={14} />
