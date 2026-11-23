@@ -6,4 +6,6 @@ These files keep the demo people and workspaces on **gh-pages** only.
 
 The overlay also sends `/` to the UX Team home, styles workspace and discussion titles as cards/rows instead of bare links, and shortens the long org label so the switcher wraps less on small screens.
 
+Sandbox-only experimental AI demos live here too: Ask Weaver (`/ask`), Weaver Scribe in meeting Reports, and the fake live transcript / recording dock. Those stay stubbed as “Coming soon” on `spring3-ui`.
+
 Do not open a pull request that copies this folder into `spring3-ui`.
