@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+// React hooks, form typing, and routing utilities used on this page
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+
+// Discussion records, workspace context, session information, and write operations
+// Some imports provide demo values; keep these unchanges until the data integration is reviewed
 import { YOU } from '../data/documents'
 import {
   DEMO_COMPOSER,
@@ -14,8 +18,10 @@ import { useSession } from '../data/session'
 import { postDiscussion } from '../data/writes'
 import { openWorkspace } from '../data/live'
 
+// Supported list filters. Archived is handled separately from the visible filter buttons
 type FilterId = 'all' | DiscussionStatus | 'mine' | 'archived'
 
+// Labels for the primary discussion filter tabs
 const FILTERS: { id: FilterId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'open', label: 'Open' },
@@ -23,6 +29,7 @@ const FILTERS: { id: FilterId; label: string }[] = [
   { id: 'mine', label: 'Started by me' },
 ]
 
+// Wraps selected editor text with formatting markers and returns the new cursor position
 function wrapSelection(value: string, start: number, end: number, before: string, after: string) {
   const selected = value.slice(start, end) || 'text'
   const next = `${value.slice(0, start)}${before}${selected}${after}${value.slice(end)}`
@@ -30,16 +37,22 @@ function wrapSelection(value: string, start: number, end: number, before: string
   return { next, cursor }
 }
 
+// Main page: resolves workspace content, manages the composer, and renders discussions
 function DiscussionsPage() {
+  // Resolve the signed-in user and current workspace from the URL
   const [params] = useSearchParams()
   const session = useSession()
   const you = session.status === 'signed-in' ? session.user : null
   const workspace = workspaceFromLocation('/discussions', params.toString() ? `?${params.toString()}` : '')
   const requestedWorkspace = params.get('workspace')
+
+  // Limit the loaded discussions when a workspace filter is provided in the URL
   const discussions = useDiscussions().filter(
     (row) => !requestedWorkspace || row.workspaceId === requestedWorkspace,
   )
 
+  // Ask the backend to open the workspace when session and workspace keys are available
+  // A failed request does not clear discussions that were already loaded
   useEffect(() => {
     if (!you || !workspace.siteKey || !workspace.pageKey) {
       return
@@ -49,21 +62,29 @@ function DiscussionsPage() {
     })
   }, [you, workspace.siteKey, workspace.pageKey])
 
+  // Local UI state: list controls, composer fields, and submission feedback
   const [filter, setFilter] = useState<FilterId>('all')
   const [query, setQuery] = useState('')
   const [composerOpen, setComposerOpen] = useState(params.get('new') === '1')
+
+  // References for mobile modal focus management
+  const subjectRef = useRef<HTMLInputElement>(null)
+  const newButtonRef = useRef<HTMLButtonElement>(null)
+  const composerRef = useRef<HTMLFormElement>(null)
   const [subject, setSubject] = useState(DEMO_COMPOSER.subject)
   const [body, setBody] = useState(DEMO_COMPOSER.body)
   const [notify, setNotify] = useState(true)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
+  // Support direct links that open the new discussion composer (?new=1)
   useEffect(() => {
     if (params.get('new') === '1') {
       setComposerOpen(true)
     }
   }, [params])
 
+  // Calculate the badge counts shown beside the discussion filters
   const counts: Record<FilterId, number> = {
     all: discussions.length,
     open: discussions.filter((row) => row.status === 'open').length,
@@ -72,6 +93,7 @@ function DiscussionsPage() {
     archived: 0,
   }
 
+  // Apply the selected status/ownership filter abd case-insensitive text search
   const visible = useMemo(() => {
     const search = query.trim().toLowerCase()
     return discussions.filter((row) => {
@@ -91,18 +113,109 @@ function DiscussionsPage() {
     })
   }, [discussions, filter, query])
 
+  // Restore the composer defaults after closing or successfully submitting
   function resetComposer() {
     setSubject(DEMO_COMPOSER.subject)
     setBody(DEMO_COMPOSER.body)
     setNotify(true)
   }
 
+  // Hide the composer and clear any previous validation error
   function closeComposer() {
     setComposerOpen(false)
     resetComposer()
     setFormError('')
   }
 
+  // Allow users to close the composer with Escape
+  useEffect(() => {
+    if (!composerOpen) return
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        closeComposer()
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape)
+    }
+  }, [composerOpen])
+
+  // Prevent background scrolling while the mobile modal is open
+  useEffect(() => {
+    if (!composerOpen) return
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    if (!mediaQuery.matches) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [composerOpen])
+
+  // Move focus into the mobile modal and restore it when closed
+  useEffect(() => {
+    if (!composerOpen) return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+
+    const previousFocus = document.activeElement as HTMLElement | null
+
+    subjectRef.current?.focus()
+
+    return () => {
+      if (previousFocus?.isConnected) {
+        previousFocus.focus()
+      } else {
+        newButtonRef.current?.focus()
+      }
+    }
+  }, [composerOpen])
+
+  // Keep Tab navigation inside the mobile discussion modal
+  useEffect(() => {
+    if (!composerOpen) return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+
+    function handleTab(event: KeyboardEvent) {
+      if (event.key !== 'Tab') return
+
+      const composer = composerRef.current
+      if (!composer) return
+
+      const focusable = Array.from(
+        composer.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href]'
+        )
+      ).filter((element) => element.getClientRects().length > 0)
+
+      if (!focusable.length) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      if (event.shiftKey && (document.activeElement === first || !composer.contains(document.activeElement))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (document.activeElement === last || !composer.contains(document.activeElement))) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleTab)
+
+    return () => {
+      document.removeEventListener('keydown', handleTab)
+    }
+  }, [composerOpen])
+
+  // Insert lightweight markup around the textarea selection, then restore focus
   function applyMarkup(before: string, after: string) {
     const field = document.getElementById('discussion-body') as HTMLTextAreaElement | null
     const start = field?.selectionStart ?? body.length
@@ -115,6 +228,8 @@ function DiscussionsPage() {
     })
   }
 
+  // Validate and submit a new discussion as either a draft or published topic
+  // The clicked submit button determines which action is requested
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const intent = (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value')
@@ -147,6 +262,7 @@ function DiscussionsPage() {
     }
   }
 
+  // Page layout: breadcrumbs, composer, list controls, and discussion results
   return (
     <section className="doc-library discussions">
       <header className="doc-library-head">
@@ -166,44 +282,87 @@ function DiscussionsPage() {
             <span aria-current="page">Discussions</span>
           </span>
         </nav>
-        <div className="title-row">
-          <h1>Discussions</h1>
-          <span className="count-pill">{discussions.length}</span>
-        </div>
+      <div className="title-row">
+        <h1>Discussions</h1>
+        <span className="count-pill">{discussions.length}</span>
+
+        {/* Mobile: new discussion action beside the heading */}
+        <button
+        ref={newButtonRef}
+          type="button"
+          className="button-solid discussion-mobile-new"
+          onClick={() => setComposerOpen(true)}
+        >
+        <span aria-hidden="true">+</span>
+          New
+        </button>
+      </div>
         <p className="description">
           Start a topic for the group right here. Drafts are visible only to you until you publish them.
         </p>
       </header>
 
+      {/* Show the editable composer or the compact new-discussion starter */}
       {composerOpen ? (
-        <form className="discussion-composer" onSubmit={onSubmit}>
-          <div className="discussion-composer-head">
-            <span className="person-avatar lg" aria-hidden="true">
-              {YOU.initials}
-            </span>
+        <form 
+          ref={composerRef}
+          className="discussion-composer"
+          role="dialog"
+          aria-modal={true}
+          aria-label="New discussion" 
+          onSubmit={onSubmit}>
+        <div className="discussion-composer-head">
+          {/* Desktop modal header */}
+          <div className="discussion-composer-author">
+            <span className="discussion-header-icon" aria-hidden="true">♧</span>
+
             <div>
-              <h2>New discussion</h2>
-              <p>This posts in {workspace.name}.</p>
+              <h2>New discussion topic</h2>
+              <p>
+                Give it a clear subject and a short summary.
+                The conversation starts after you publish.
+              </p>
             </div>
-            <button className="doc-close" type="button" aria-label="Close" onClick={closeComposer}>
-              ×
-            </button>
           </div>
 
+          {/* Mobile bottom-sheet title */}
+          <h2 className="discussion-mobile-title">New discussion</h2>
+
+          {/* Desktop close button */}
+          <button
+            type="button"
+            className="discussion-close"
+            aria-label="Close new discussion"
+            onClick={closeComposer}
+            disabled={saving}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Subject field and short-description editor */}
           <div className="discussion-composer-grid">
             <label className="discussion-field">
               <span>
                 Subject <abbr title="required">*</abbr>
               </span>
               <input
+                placeholder="e.g. ‘Division of heuristic evaluation’"
+                ref={subjectRef}
                 value={subject}
                 maxLength={SUBJECT_LIMIT}
                 onChange={(event) => setSubject(event.target.value)}
                 required
               />
-              <span className="discussion-count">
-                {subject.length} / {SUBJECT_LIMIT}
-              </span>
+              <div className="discussion-subject-footer">
+                <span className="discussion-subject-help">
+                  A few words so others know what it's about
+                </span>
+
+                <span className="discussion-count">
+                  {subject.length} / {SUBJECT_LIMIT}
+                </span>
+              </div>
             </label>
 
             <label className="discussion-field">
@@ -228,18 +387,35 @@ function DiscussionsPage() {
                   value={body}
                   rows={4}
                   onChange={(event) => setBody(event.target.value)}
+                  placeholder="What should the group discuss, and why now?"
                 />
               </div>
+
+              <p className="discussion-description-help">
+                Keep it brief. Replies go inside the discussion.
+              </p> 
             </label>
           </div>
 
+        {/* Notification preference and draft/publish actions */}
           <div className="discussion-composer-foot">
+            
             <label className="discussion-notify">
-              <input type="checkbox" checked={notify} onChange={(event) => setNotify(event.target.checked)} />
-              Notify workspace members when published
+              <input
+                type="checkbox"
+                role="switch"
+                checked={notify}
+                onChange={(event) => setNotify(event.target.checked)}
+              />
+
+              <span className="discussion-desktop-check" aria-hidden="true" />
+
+              <span>Notify workspace members when published</span>
+
+              <span className="discussion-switch" aria-hidden="true" />
             </label>
             <div className="discussion-composer-actions">
-              <button className="button-light docs-secondary" type="button" onClick={closeComposer} disabled={saving}>
+              <button className="button-light docs-secondary discussion-cancel" type="button" onClick={closeComposer} disabled={saving}>
                 Cancel
               </button>
               <button className="button-light docs-secondary" type="submit" value="draft" disabled={saving}>
@@ -267,6 +443,7 @@ function DiscussionsPage() {
         </div>
       )}
 
+      {/* Status filters, text search, and the existing sort control */}
       <div className="doc-toolbar">
         <div className="doc-filters" role="tablist" aria-label="Discussion status">
           {FILTERS.map((item) => (
@@ -312,6 +489,7 @@ function DiscussionsPage() {
         </label>
       </div>
 
+      {/* Desktop-oriented results table; mobile presentation will be reviewed separately */}
       <div className="panel docs-table-card">
         <table className="docs-table discussions-table">
           <caption className="visually-hidden">Discussions in {workspace.name}</caption>
@@ -343,46 +521,123 @@ function DiscussionsPage() {
           Showing {visible.length} of {discussions.length} discussions
         </p>
       </div>
+
+      {/* Mobile discussion cards */}
+      <div className="discussion-mobile-list">
+        {visible.length ? (
+          visible.map((row) => (
+            <DiscussionCard key={row.id} row={row} />
+          ))
+        ) : (
+          <p className="docs-empty">
+            No discussions match these filters.
+          </p>
+        )}
+      </div>
     </section>
   )
 }
 
+// Mobile discussion card based on the UX team's mid-fi design
+function DiscussionCard ({ row }: { row: Discussion}) {
+  return (
+    <article className="discussion-card">
+      {/* Stautus, last activity, and actions */}
+      <div className="discussion-card-head">
+        <span className={`discussion-status is-${row.status}`}>
+          <span className="discussion-status-dot" aria-hidden="true" />
+          {row.status === 'open' ? 'Open' : 'Draft'}
+        </span>
+
+        <span className="discussion-card-activity">
+          {row.lastActivity}
+        </span>
+
+        <button
+          type="button"
+          className="docs-more"
+          aria-label={`More actions for ${row.title}`}
+          >
+            ...
+          </button>
+      </div>
+
+      {/* Discussion title and summary */}
+      <div className="discussion-card-content">
+        <h2>
+        <Link to={`/discussions/${row.id}${window.location.search}`}>
+          {row.title}
+        </Link>
+        </h2>
+        <p>{row.summary}</p>
+      </div>
+
+      {/* Author and reply count */}
+      <div className="discussion-card-foot">
+        <span className="doc-owner">
+          <span className="person-avatar" aria-hidden="true">
+            {row.authorInitials}
+          </span>
+          {row.authorName}
+        </span>
+
+        <span className="discussion-replies">
+          <img src="/msg0.svg" alt="" width={14} height={14} />
+          {row.replies == null ? '-' : `${row.replies} replies`}
+        </span>
+      </div>
+    </article>
+  )
+}
+
+// Renders one discussion's topic, status, author, reply count, and activity
 function DiscussionRow({ row }: { row: Discussion }) {
   return (
     <tr>
-      <td>
+      <td data-label="Topic">
         <div className="discussion-topic">
           <span className="discussion-topic-icon" aria-hidden="true">
             <img src="/msg0.svg" alt="" width={16} height={16} />
           </span>
           <span>
-            <strong>{row.title}</strong>
+            <Link to={`/discussions/${row.id}${window.location.search}`}>
+              <strong>{row.title}</strong>
+            </Link>
             <span>{row.summary}</span>
           </span>
         </div>
       </td>
-      <td>
+
+      <td data-label="Status">
         <span className={`discussion-status is-${row.status}`}>
           <span className="discussion-status-dot" aria-hidden="true" />
           {row.status === 'open' ? 'Open' : 'Draft'}
         </span>
       </td>
-      <td>
+
+      <td data-label="Started by">
         <span className="doc-owner">
           <span className="person-avatar">{row.authorInitials}</span>
           {row.authorName}
         </span>
       </td>
-      <td>
+
+      <td data-label="Replies">
         <span className="discussion-replies">
           <img src="/msg0.svg" alt="" width={14} height={14} />
           {row.replies == null ? '—' : row.replies}
         </span>
       </td>
-      <td>{row.lastActivity}</td>
-      <td>
-        <button className="docs-more" type="button" aria-label={`More actions for ${row.title}`}>
-          ···
+
+      <td data-label="Last activity">{row.lastActivity}</td>
+
+      <td data-label="Actions">
+        <button 
+          className="docs-more" 
+          type="button" 
+          aria-label={`More actions for ${row.title}`}
+        >
+          ...
         </button>
       </td>
     </tr>

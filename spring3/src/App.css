@@ -4512,7 +4512,7 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   cursor: pointer;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 767px) {
   .doc-drop,
   .doc-modal-grid {
     flex-direction: column;
@@ -4542,10 +4542,6 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
     flex-direction: column;
     align-items: stretch;
   }
-
-  .discussion-composer-grid {
-    display: flex;
-  }
 }
 
 /* Discussions */
@@ -4561,10 +4557,64 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
 }
 
 .discussion-composer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+
+  width: min(750px, calc(100vw - 48px));
+  max-height: 90dvh;
+  overflow-y: auto;
+
+  transform: translate(-50%, -50%);
+
   flex-direction: column;
   align-items: stretch;
   gap: 16px;
   padding: 18px 18px 16px;
+
+  box-shadow: 0 16px 48px rgb(0 0 0 / 20%);
+}
+
+/* Discussion modal header icon */
+.discussions .discussion-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 20px;
+}
+
+/* Discussion modal close button */
+.discussions .discussion-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.discussions .discussion-close:hover {
+  background: var(--accent-bg);
+}
+
+.discussions .discussion-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .discussion-starter-input {
@@ -4611,9 +4661,34 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   font-size: 13px;
 }
 
+/* Desktop discussion modal header */
+.discussions .discussion-composer-head {
+  background: var(--accent-bg);
+  padding: 16px 18px;
+  margin: -18px -18px 0;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Introductory instructions are mobile-only */
+.discussions .discussion-composer-intro {
+  display: none;
+}
+
+/* Desktop composer author information */
+.discussions .discussion-composer-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hide mobile heading on desktop */
+.discussions .discussion-mobile-title {
+  display: none;
+}
+
 .discussion-composer-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -4669,6 +4744,15 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   border: 0;
   border-radius: 0;
   resize: vertical;
+}
+
+/* Guidance beneath the discussion description */
+.discussion-description-help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .discussion-toolbar {
@@ -4787,6 +4871,470 @@ html[data-theme='additional-dark'] .weaver-mark-quiet {
   margin-left: auto;
 }
 
+/* Hide mobile discussion cards on desktop */
+.discussion-mobile-list {
+  display: none;
+}
+
+/* Mobile discussion card layout */
+.discussion-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.discussion-card-head,
+.discussion-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discussion-card-head .docs-more {
+  margin-left: auto;
+}
+
+.discussion-card-content h2 {
+  margin: 0 0 4px;
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.discussion-card-content p {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.discussion-card-foot {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.discussion-card-activity {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Hide mobile New button on desktop */
+.discussion-mobile-new {
+  display: none;
+}
+
+@keyframes discussion-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .discussions .discussion-composer {
+    animation: none;
+  }
+}
+
+/* Subject helper text and character counter */
+.discussion-subject-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.discussion-subject-help {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.discussion-subject-footer .discussion-count {
+  flex-shrink: 0;
+}
+
+/* Notification switch */
+.discussions .discussion-notify {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  cursor: pointer;
+}
+
+/* Visually hide checkbox while keeping it accessible */
+.discussions .discussion-notify input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Switch track */
+.discussions .discussion-switch {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: #8b929c;
+  transition: background 150ms ease;
+}
+
+/* Switch thumb */
+.discussions .discussion-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 150ms ease;
+}
+
+/* On state */
+.discussions .discussion-notify input:checked ~ .discussion-switch {
+  margin-left: auto;
+  background: #4073aa;
+}
+
+.discussions .discussion-notify input:checked ~ .discussion-switch::after {
+  transform: translateX(20px);
+}
+
+/* Visible keyboard focus */
+.discussions .discussion-notify input:focus-visible ~ .discussion-switch {
+  outline: 3px solid #4073aa;
+  outline-offset: 3px;
+}
+
+/* Dim the Discussions page when the composer is open */
+.discussions:has(.discussion-composer)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgb(0 0 0 / 45%);
+}
+
+/* Desktop composer Cancel button */
+.discussions .discussion-cancel {
+  width: auto;
+  height: auto;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discussions .discussion-switch,
+  .discussions .discussion-switch::after {
+    transition: none;
+  }
+}
+
+/* Desktop discussion modal footer */
+@media (min-width: 768px) {
+  .discussions .discussion-composer-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .discussions .discussion-composer-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-left: 0;
+    gap: 8px;
+  }
+
+  .discussions .discussion-composer-actions .discussion-cancel {
+    margin-right: auto;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+  }
+
+  .discussions .discussion-composer-actions .discussion-cancel:hover {
+    color: var(--text-h);
+    background: var(--accent-soft);
+  }
+}
+
+/* Desktop notification checkbox */
+@media (min-width: 768px) {
+  .discussions .discussion-notify .discussion-switch {
+    display: none;
+  }
+
+  .discussions .discussion-desktop-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+
+  .discussions .discussion-notify input:checked ~ .discussion-desktop-check::after {
+    content: "✓";
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .discussions .discussion-notify input:focus-visible ~ .discussion-desktop-check {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+/* Keep the desktop checkbox hidden on mobile */
+@media (max-width: 767px) {
+  .discussions .discussion-desktop-check {
+    display: none;
+  }
+}
+
+/* Mobile Discussions */
+  @media (max-width: 767px) {
+  /* Mobile bottom sheet */
+  .discussions .discussion-composer {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    width: 100%;
+    height: 94dvh;
+    max-height: 94dvh;
+    margin: 0;
+    padding: 20px 16px;
+
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 24px 24px 0 0;
+    background: var(--surface);
+    box-shadow: 0 -8px 30px rgb(0 0 0 / 15%);
+
+    animation: discussion-slide-up 550ms ease-out both;
+  }
+
+  /* Visual handle for the mobile bottom sheet */
+  .discussions .discussion-composer::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 44px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  /* Mobile composer header */
+  .discussions .discussion-composer-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-height: 48px;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Hide desktop author information */
+  .discussions .discussion-composer-head .discussion-composer-author {
+    display: none;
+  }
+
+  /* Show centered mobile title */
+  .discussions .discussion-composer-head .discussion-mobile-title {
+    display: block;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  /* Position Cancel on the left */
+  .discussions .discussion-composer-head .discussion-cancel {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+  }
+
+  .discussions .discussion-composer-intro {
+    display: block;
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Stack the form fields */
+  .discussions .discussion-composer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Mobile: notification stays above, buttons stay at bottom */
+  .discussions .discussion-composer-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1;
+    gap: 16px;
+    margin-top: 0;
+  }
+
+
+  /* Mobile footer buttons */
+  .discussions .discussion-composer-actions {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    margin-top: auto;
+    margin-left: 0;
+    padding-bottom: 20px;
+  }
+
+  .discussions .discussion-composer-actions button {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+
+  /* Mobile modal Cancel button */
+  .discussions .discussion-cancel {
+    width: auto;
+    height: auto;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* Hide the footer Cancel button on mobile */
+  .discussions .discussion-composer-actions button:first-child {
+    display: none;
+  }
+
+  /* Hide desktop table */
+  .discussions .docs-table-card {
+    display: none;
+  }
+
+  /* Display mobile discussion cards */
+  .discussion-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Hide the desktop discussion starter on mobile */
+  .discussions .discussion-starter {
+    display: none;
+  }
+
+  /* Display the mobile New button beside the heading */
+  .discussions .discussion-mobile-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 10px 16px;
+  }
+
+  /* Discussion titles remain accessible links */
+  .discussions .discussion-card-content h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .discussions .discussion-card-content h2 a:hover {
+    text-decoration: underline;
+  }
+
+  .discussions .discussion-card-content h2 a:focus-visible {
+    outline: 2px solid var(--primary, #4073aa);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Keep the heading and New button aligned */
+  .discussions .title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Keep discussion filters on one scrollable row */
+  .discussions .doc-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .discussions .doc-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .discussions .doc-filters button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Hide desktop sorting control on mobile */
+  .discussions .docs-select {
+    display: none;
+  }
+}
+
+/* ==================================================== 
+  Dark Theme - Icon Adjustments
+  Adjust icon filters for visibility against dark backgrounds
+  ===================================================== */
 html[data-theme='additional-dark'] .nav-item img,
 html[data-theme='additional-dark'] .workspace-switcher img,
 html[data-theme='additional-dark'] .workspace-name img,
