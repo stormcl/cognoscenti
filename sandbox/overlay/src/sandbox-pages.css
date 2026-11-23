@@ -1,0 +1,82 @@
+/* Sandbox-only polish for GitHub Pages. Overlaid at build time with VITE_SANDBOX=1. */
+
+.discussion-topic a,
+.discussion-card-content h2 a,
+.sandbox-workspace-list a,
+.sandbox-workspace-cards a,
+.doc-name,
+a.workspace-child {
+  color: inherit;
+  text-decoration: none;
+}
+
+.discussion-topic a:hover strong,
+.discussion-card-content h2 a:hover,
+.sandbox-workspace-cards .workspace-child:hover strong {
+  color: var(--accent);
+}
+
+.sandbox-workspace-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sandbox-workspace-cards .workspace-child {
+  margin-left: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.sandbox-workspace-cards .workspace-child::before {
+  content: none;
+}
+
+.sandbox-workspace-cards .workspace-name strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.workspace-switcher .workspace-name strong,
+.workspace-child .workspace-name strong,
+.title-row h1 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.workspace-switcher .workspace-name strong,
+.workspace-child .workspace-name strong {
+  white-space: normal;
+  text-overflow: unset;
+}
+
+@media (max-width: 767px) {
+  .title-row h1 {
+    -webkit-line-clamp: 3;
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .brand-name {
+    max-width: min(160px, 42vw);
+    height: 16px;
+  }
+
+  .site-header .brand {
+    gap: 8px;
+    min-width: 0;
+  }
+}

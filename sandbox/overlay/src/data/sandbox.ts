@@ -40,7 +40,7 @@ const TEAMS: Team[] = [
     pageKey: 'organization',
     circle: 'organization',
     code: 'IDA',
-    name: 'Integrated Digital Agency Class Workspace',
+    name: 'IDA Class Workspace',
     description:
       'Aim: Parent workspace for the Integrated Digital Agency class. Coordinate all teams, shared planning, and class-wide resources.',
     parent: true,
@@ -435,7 +435,7 @@ function buildDemo(seed: SeedBundle): WorkspaceDemo {
     breadcrumbs: team.parent
       ? [{ label: team.name }]
       : [
-          { label: 'Integrated Digital Agency Class Workspace', path: workspacePath(SITE, 'organization') },
+          { label: 'IDA Class', path: workspacePath(SITE, 'organization') },
           { label: team.name },
         ],
     hierarchy: hierarchy(),
@@ -446,11 +446,16 @@ function buildDemo(seed: SeedBundle): WorkspaceDemo {
 export function seedSandboxStores() {
   setDocumentOwner(SANDBOX_USER.name, initialsFor(SANDBOX_USER.name))
 
-  const demos = SEEDS.map((seed) => buildDemo(seed))
-  const meetings = SEEDS.map((seed) => asMeeting(seed, workspaceIdFor(SITE, seed.team.pageKey)))
-  const documents = SEEDS.flatMap((seed) => asDocuments(seed, workspaceIdFor(SITE, seed.team.pageKey)))
-  const discussions = SEEDS.flatMap((seed) => asDiscussions(seed, workspaceIdFor(SITE, seed.team.pageKey)))
-  const profiles = SEEDS.flatMap((seed) => {
+  // UX first so pages without ?workspace= (discussions, documents) open the demo home circle.
+  const ordered = [
+    ...SEEDS.filter((seed) => seed.team.pageKey === 'ux'),
+    ...SEEDS.filter((seed) => seed.team.pageKey !== 'ux'),
+  ]
+  const demos = ordered.map((seed) => buildDemo(seed))
+  const meetings = ordered.map((seed) => asMeeting(seed, workspaceIdFor(SITE, seed.team.pageKey)))
+  const documents = ordered.flatMap((seed) => asDocuments(seed, workspaceIdFor(SITE, seed.team.pageKey)))
+  const discussions = ordered.flatMap((seed) => asDiscussions(seed, workspaceIdFor(SITE, seed.team.pageKey)))
+  const profiles = ordered.flatMap((seed) => {
     const id = workspaceIdFor(SITE, seed.team.pageKey)
     const path = workspacePath(SITE, seed.team.pageKey)
     return asProfiles(seed.team.circle, id, seed.team.name, path)
