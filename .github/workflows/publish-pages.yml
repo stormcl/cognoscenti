@@ -40,7 +40,10 @@ jobs:
           cp pages/sandbox/overlay/src/data/live.ts ui/spring3/src/data/live.ts
           cp pages/sandbox/overlay/src/data/workspaces.ts ui/spring3/src/data/workspaces.ts
           cp pages/sandbox/overlay/src/components/WorkspaceLayout.tsx ui/spring3/src/components/WorkspaceLayout.tsx
+          cp pages/sandbox/overlay/src/components/Sidebar.tsx ui/spring3/src/components/Sidebar.tsx
           cp pages/sandbox/overlay/src/pages/WorkspaceListPage.tsx ui/spring3/src/pages/WorkspaceListPage.tsx
+          cp pages/sandbox/overlay/src/pages/AskWeaverPage.tsx ui/spring3/src/pages/AskWeaverPage.tsx
+          cp pages/sandbox/overlay/src/pages/MeetingRoomPage.tsx ui/spring3/src/pages/MeetingRoomPage.tsx
           cp pages/sandbox/overlay/src/App.tsx ui/spring3/src/App.tsx
           cp pages/sandbox/overlay/src/main.tsx ui/spring3/src/main.tsx
           cp pages/sandbox/overlay/src/sandbox-pages.css ui/spring3/src/sandbox-pages.css
