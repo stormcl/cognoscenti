@@ -1,0 +1,73 @@
+name: publish pages sandbox
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - gh-pages
+    paths:
+      - 'sandbox/**'
+      - '.github/workflows/publish-pages.yml'
+
+concurrency:
+  group: publish-pages-sandbox
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: checkout gh-pages fixtures
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: checkout spring3-ui source
+        uses: actions/checkout@v4
+        with:
+          ref: spring3-ui
+          path: ui
+
+      - name: overlay sandbox fixtures onto the ui build
+        run: |
+          set -euo pipefail
+          cp pages/sandbox/overlay/src/data/testdata.ts ui/spring3/src/data/testdata.ts
+          cp pages/sandbox/overlay/src/data/sandbox.ts ui/spring3/src/data/sandbox.ts
+          cp pages/sandbox/overlay/src/data/session.ts ui/spring3/src/data/session.ts
+          cp pages/sandbox/overlay/src/data/live.ts ui/spring3/src/data/live.ts
+          cp pages/sandbox/overlay/src/components/WorkspaceLayout.tsx ui/spring3/src/components/WorkspaceLayout.tsx
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/spring3/package-lock.json
+
+      - name: build sandbox site
+        working-directory: ui/spring3
+        env:
+          VITE_SANDBOX: '1'
+        run: |
+          npm ci
+          npm run build
+
+      - name: publish dist to gh-pages
+        working-directory: pages
+        run: |
+          set -euo pipefail
+          rm -rf assets
+          mkdir assets
+          tar -C ../ui/spring3/dist --exclude=WEB-INF --exclude=META-INF -cf - . | tar -xf -
+          git config user.name theazora
+          git config user.email theabalzora@gmail.com
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Published site already matches the build."
+            exit 0
+          fi
+          git commit -m "$(printf 'publish the sandbox build with demo data.\n\nthe pages site rebuilds from spring3-ui with the gh-pages fixtures overlaid so the demo lists stay off the server branch.\n')"
+          git push origin HEAD:gh-pages
