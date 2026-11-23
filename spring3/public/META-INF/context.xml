@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <!-- Client routes load index.html. Files with an extension are served as themselves. -->
+  <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
+</Context>

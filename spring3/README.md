@@ -1,13 +1,14 @@
 # Spring 3 UI
 
-The Spring 3 UI is a static site served from the host root. Weaver stays a separate Tomcat application at `/weaver/`. This build calls that application on the same host.
+The Spring 3 UI is a static site that can sit in any Tomcat folder next to Weaver. Weaver stays a separate application at `/weaver/`. This build calls that application on the same host. The folder name is the address, for example `/spring3/`, and the same `dist` works if the folder is named something else. No second build.
 
 <!--
 In example, this server:
-- UI: https://s07.circleweaver.com/
+- UI: https://s07.circleweaver.com/spring3/
 - Weaver: https://s07.circleweaver.com/weaver/
 - baseURL in WEB-INF/config.txt: https://s07.circleweaver.com/weaver/
-- Tomcat ROOT: /opt/tomcat/webapps/ROOT/
+- Tomcat UI folder: /opt/tomcat/webapps/spring3/
+- Tomcat ROOT: /opt/tomcat/webapps/ROOT/ (leave the existing site here)
 - Weaver app: /opt/tomcat/webapps/weaver/
 - libFolder: /opt/weaver_sites/
 - userFolder: /opt/weaver_user/
@@ -31,10 +32,10 @@ The site files are in `spring3/dist`. That folder is not committed.
 
 ## Install on Tomcat
 
-Copy the contents of `spring3/dist` into Tomcat's `ROOT` webapp, so `index.html` is served at `/`.
+Copy the contents of `spring3/dist` into a new Tomcat webapp folder, for example `webapps/spring3/`, so `index.html` is served at `/spring3/`. Any other folder name works with this same build. Leave `webapps/ROOT/` alone so the existing site stays up, and leave `webapps/weaver/` alone.
 
-Leave the Weaver application in its own webapp, `webapps/weaver/`. Do not copy `dist` into that folder. This build loads `/assets/` and images from the host root, and it calls `/weaver/auth/query` and `/weaver/v/session.json`.
+Do not copy `dist` into the Weaver folder. Images and `/assets/` load from the folder you copied into. API calls stay on the host at `/weaver/auth/query` and `/weaver/v/session.json`.
 
-Open the host root and sign in. Login uses the identity provider already set in `WEB-INF/config.txt`. `baseURL` in that file should be the public Weaver address, ending in `/weaver/`.
+Open that folder, for example `http://localhost:8080/spring3/`, and sign in. Login uses the identity provider already set in Weaver's `WEB-INF/config.txt`. `baseURL` in that file should be the public Weaver address, ending in `/weaver/`.
 
-If the stock Tomcat welcome (or previous legacy build page) is still showing, rename `ROOT/index.jsp` and reload.
+`dist` includes a small Tomcat config so a direct visit to a client route such as `/spring3/discussions` still loads the app. That config only applies when the copy is its own webapp, which is the layout above.
