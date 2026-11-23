@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useNotices } from '../data/notices'
 import { profileHref } from '../data/profiles'
 import { initialsFor, loginRedirect, useSession } from '../data/session'
-import { applyTheme, brandMark, experimentalThemes, mainThemes, readTheme, type ThemeId } from '../theme'
+import { applyTheme, brandMark, DEFAULT_THEME, experimentalThemes, mainThemes, readTheme, type ThemeId } from '../theme'
 import Menu from './Menu'
 
 type HeaderProps = {
@@ -24,8 +24,11 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
   const [theme, setTheme] = useState<ThemeId>(() => readTheme())
 
   function chooseTheme(next: ThemeId) {
-    applyTheme(next)
-    setTheme(next)
+    setTheme(applyTheme(next))
+  }
+
+  function onMarkError() {
+    if (theme !== DEFAULT_THEME) setTheme(applyTheme(DEFAULT_THEME))
   }
 
   useEffect(() => {
@@ -63,7 +66,7 @@ function Header({ menuOpen, setMenuOpen }: HeaderProps) {
 
       <Link className="brand" to="/">
         <span className="brand-logo" aria-hidden="true">
-          <img src={brandMark(theme)} alt="" width={48} height={48} />
+          <img src={brandMark(theme)} alt="" width={48} height={48} onError={onMarkError} />
         </span>
         <img className="brand-name" src="/weaver-wordmark.svg" alt="Circle Weaver" />
       </Link>

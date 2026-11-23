@@ -1,12 +1,13 @@
 export const THEME_KEY = 'weaver-dev-theme'
+export const DEFAULT_THEME = 'weaver-indigo' as const
 
 export const themes = [
   { id: 'weaver-indigo', label: 'Weaver Indigo (Light)', group: 'main' },
   { id: 'weaver-midnight', label: 'Weaver Midnight (Dark)', group: 'main' },
   { id: 'weaver-aqua', label: 'Weaver Aqua (Light)', group: 'main' },
   { id: 'weaver-depth', label: 'Weaver Depth (Dark)', group: 'main' },
-  { id: 'additional-light', label: 'Additional light', group: 'experimental' },
-  { id: 'additional-dark', label: 'Additional dark', group: 'experimental' },
+  { id: 'additional-light', label: 'Weaver Sun', group: 'experimental' },
+  { id: 'additional-dark', label: 'Weaver Moon', group: 'experimental' },
 ] as const
 
 export type ThemeId = (typeof themes)[number]['id']
@@ -28,20 +29,29 @@ export function readTheme(): ThemeId {
     const stored = window.localStorage.getItem(THEME_KEY)
     if (isThemeId(stored)) return stored
     if (stored && legacyThemes[stored]) return legacyThemes[stored]
-    return 'weaver-indigo'
+    return DEFAULT_THEME
   } catch {
-    return 'weaver-indigo'
+    return DEFAULT_THEME
   }
 }
 
-export function applyTheme(id: ThemeId) {
-  document.documentElement.dataset.theme = id
+export function applyTheme(id: ThemeId): ThemeId {
+  const next = isThemeId(id) ? id : DEFAULT_THEME
   try {
-    window.localStorage.setItem(THEME_KEY, id)
+    document.documentElement.dataset.theme = next
+    window.localStorage.setItem(THEME_KEY, next)
   } catch {
-    // the theme still applies for this visit
+    document.documentElement.dataset.theme = DEFAULT_THEME
+    try {
+      window.localStorage.setItem(THEME_KEY, DEFAULT_THEME)
+    } catch {
+      // indigo still applies for this visit
+    }
+    window.dispatchEvent(new Event('weaver-theme'))
+    return DEFAULT_THEME
   }
   window.dispatchEvent(new Event('weaver-theme'))
+  return next
 }
 
 const darkBoxThemes: ThemeId[] = ['weaver-midnight', 'weaver-depth']

@@ -99,8 +99,7 @@ function Sidebar({ menuOpen, collapsed, closeMenu, onToggleCollapsed }: SidebarP
   const [theme, setTheme] = useState<ThemeId>(() => readTheme())
 
   function chooseTheme(next: ThemeId) {
-    applyTheme(next)
-    setTheme(next)
+    setTheme(applyTheme(next))
   }
 
   function onSwitcherClick() {

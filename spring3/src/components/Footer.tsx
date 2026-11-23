@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { documentsPath } from '../data/documents'
-import { brandMark, readTheme } from '../theme'
+import { applyTheme, brandMark, DEFAULT_THEME, readTheme } from '../theme'
 import { workspaceFromLocation } from '../data/workspaces'
 
 const homeLinks = [
@@ -48,7 +48,15 @@ function Footer() {
       <div className="footer-top">
         <Link className="footer-brand" to="/">
           <span className="footer-mark" aria-hidden="true">
-            <img src={brandMark(theme)} alt="" width={40} height={40} />
+            <img
+              src={brandMark(theme)}
+              alt=""
+              width={40}
+              height={40}
+              onError={() => {
+                if (theme !== DEFAULT_THEME) applyTheme(DEFAULT_THEME)
+              }}
+            />
           </span>
           <img className="brand-name" src="/weaver-wordmark.svg" alt="Circle Weaver" />
         </Link>
