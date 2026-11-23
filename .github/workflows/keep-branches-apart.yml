@@ -1,0 +1,56 @@
+name: keep the sandbox and the server branch apart
+
+on:
+  pull_request:
+    branches:
+      - spring3-ui
+      - gh-pages
+
+jobs:
+  demo-data-stays-on-gh-pages:
+    if: github.base_ref == 'spring3-ui'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: stop sandbox data from riding into spring3-ui
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          files="$(git diff --name-only "$base" "$head" -- spring3/src/data)"
+          if [ -n "$files" ]; then
+            echo "This pull request targets spring3-ui and it changes spring3/src/data."
+            echo "That folder is the sandbox data for the gh-pages site. Leave it on gh-pages so it does not come along into the server branch."
+            echo "$files"
+            exit 1
+          fi
+          echo "No sandbox data in this pull request."
+
+  server-code-stays-off-gh-pages:
+    if: github.base_ref == 'gh-pages'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: keep weaver and the server files off gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          files="$(git diff --name-only "$base" "$head" -- weaverWar docker testdata)"
+          if [ -n "$files" ]; then
+            echo "This pull request targets gh-pages and it changes server files."
+            echo "gh-pages is the ui sandbox. weaverWar, docker, and testdata stay with the server branch."
+            echo "$files"
+            exit 1
+          fi
+          echo "No server files in this pull request."
